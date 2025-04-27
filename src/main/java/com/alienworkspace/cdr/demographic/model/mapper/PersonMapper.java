@@ -26,15 +26,24 @@ public interface PersonMapper {
      * @return a PersonDto representation of the given Person entity
      */
     default PersonDto personToPersonDto(Person person) {
-        return PersonDto.builder()
+        PersonDto personDto = PersonDto.builder()
                 .personId(person.getPersonId())
                 .gender(person.getGender())
                 .birthDate(person.getBirthDate())
                 .dead(person.isDead())
                 .deathDate(person.getDeathDate())
                 .causeOfDeath(person.getCauseOfDeath())
-                .uuid(person.getUuid())
                 .build();
+        personDto.setCreatedAt(person.getCreatedAt());
+        personDto.setCreatedBy(person.getCreatedBy());
+        personDto.setLastModifiedAt(person.getLastModifiedAt());
+        personDto.setLastModifiedBy(person.getLastModifiedBy());
+        personDto.setVoided(person.isVoided());
+        personDto.setVoidedAt(person.getVoidedAt());
+        personDto.setVoidedBy(person.getVoidedBy());
+        personDto.setVoidReason(person.getVoidReason());
+        personDto.setUuid(person.getUuid());
+        return personDto;
     }
 
     /**

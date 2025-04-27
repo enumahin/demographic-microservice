@@ -115,7 +115,7 @@ public class PersonServiceImpl implements PersonService {
                 person.setGender(personDto.getGender());
             }
 
-            person.setLastModifiedBy(1);
+            person.setLastModifiedBy(1L);
             person.setLastModifiedAt(LocalDateTime.now());
 
             return personRepository.save(person);

@@ -38,7 +38,7 @@ public class AuditTrail {
 
     @CreatedBy
     @Column(name = "created_by", updatable = false)
-    private int createdBy;
+    private long createdBy;
 
     @CreatedDate
     @Column(name = "created_at", updatable = false)
@@ -46,7 +46,7 @@ public class AuditTrail {
 
     @LastModifiedBy
     @Column(name = "last_modified_by", insertable = false)
-    private Integer lastModifiedBy;
+    private Long lastModifiedBy;
 
     @LastModifiedDate
     @Column(name = "last_modified_at", insertable = false)

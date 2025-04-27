@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 @Component("auditAwareImpl")
 public class AuditAwareImpl implements AuditorAware<Long> {
 
-
     /**
      * Returns the current auditor. This is the value of the {@code createdBy},
      * {@code lastModifiedBy} fields in the {@link AuditTrail} class.
