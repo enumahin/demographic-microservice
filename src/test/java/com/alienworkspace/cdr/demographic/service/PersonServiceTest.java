@@ -7,6 +7,7 @@ import com.alienworkspace.cdr.demographic.repository.PersonRepository;
 import com.alienworkspace.cdr.demographic.service.impl.PersonServiceImpl;
 import com.alienworkspace.cdr.model.dto.person.PersonDto;
 import com.alienworkspace.cdr.model.helper.RecordVoidRequest;
+import com.alienworkspace.cdr.model.helper.ResponseDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -205,10 +206,10 @@ public class PersonServiceTest {
         when(personRepository.save(updatedPerson)).thenReturn(updatedPerson);
 
         // when
-        String response = personService.deletePerson(recordVoidRequest);
+        ResponseDto response = personService.deletePerson(recordVoidRequest);
 
         // then
-        assertEquals("Person deleted successfully", response);
+        assertEquals("Person deleted successfully", response.getStatusMessage());
     }
 
     @DisplayName("Test delete non existing person.")

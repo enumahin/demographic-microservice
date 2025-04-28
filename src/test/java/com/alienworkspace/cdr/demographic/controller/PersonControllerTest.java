@@ -5,6 +5,7 @@ import com.alienworkspace.cdr.demographic.repository.PersonRepository;
 import com.alienworkspace.cdr.demographic.service.impl.PersonServiceImpl;
 import com.alienworkspace.cdr.model.dto.person.PersonDto;
 import com.alienworkspace.cdr.model.helper.RecordVoidRequest;
+import com.alienworkspace.cdr.model.helper.ResponseDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -180,7 +181,7 @@ public class PersonControllerTest {
     @Test
     public void testDeletePerson() throws Exception {
         // given
-        given(personService.deletePerson(any(RecordVoidRequest.class))).willReturn("Person deleted successfully");
+        given(personService.deletePerson(any(RecordVoidRequest.class))).willReturn(new ResponseDto(200, "Person deleted successfully"));
         RecordVoidRequest recordVoidRequest = RecordVoidRequest.builder()
                 .resourceId(String.valueOf(1L))
                 .resourceUUID(null)

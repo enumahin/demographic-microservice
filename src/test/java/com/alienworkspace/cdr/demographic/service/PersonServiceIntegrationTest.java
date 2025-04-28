@@ -4,6 +4,7 @@ import com.alienworkspace.cdr.demographic.integration.AbstractionContainerBaseTe
 import com.alienworkspace.cdr.demographic.repository.PersonRepository;
 import com.alienworkspace.cdr.model.dto.person.PersonDto;
 import com.alienworkspace.cdr.model.helper.RecordVoidRequest;
+import com.alienworkspace.cdr.model.helper.ResponseDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -138,11 +139,11 @@ public class PersonServiceIntegrationTest extends AbstractionContainerBaseTest {
                 .resourceId(String.valueOf(savedPerson.getPersonId()))
                 .build();
 
-        String response = personService.deletePerson(request);
+        ResponseDto response = personService.deletePerson(request);
         PersonDto deletedPerson = personService.getPerson(savedPerson.getPersonId());
 
         // then
-        assertEquals("Person deleted successfully", response);
+        assertEquals("Person deleted successfully", response.getStatusMessage());
         assertNotNull(deletedPerson);
         assertTrue(deletedPerson.getVoided());
         assertNotNull(deletedPerson.getVoidedAt());

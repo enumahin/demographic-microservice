@@ -9,6 +9,8 @@ import com.alienworkspace.cdr.model.dto.person.PersonDto;
 import com.alienworkspace.cdr.model.helper.RecordVoidRequest;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import com.alienworkspace.cdr.model.helper.ResponseDto;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -131,7 +133,7 @@ public class PersonServiceImpl implements PersonService {
      * @return a message indicating the outcome of the deletion
      */
     @Override
-    public String deletePerson(RecordVoidRequest recordVoidRequest) {
+    public ResponseDto deletePerson(RecordVoidRequest recordVoidRequest) {
         Long id = Long.valueOf(recordVoidRequest.getResourceId());
         String reason = recordVoidRequest.getVoidReason();
         return personRepository.findById(id)
@@ -141,7 +143,7 @@ public class PersonServiceImpl implements PersonService {
                     person.setVoidedAt(LocalDateTime.now());
                     person.setVoidedBy(1L); // Set the ID of the user who voided the record if available, else set to 1;
                     personRepository.save(person);
-                    return "Person deleted successfully";
+                    return new ResponseDto(200, "Person deleted successfully");
                 }).orElseThrow(() -> new ResourceNotFoundException(String.format("PersonId of %d not found", id)));
     }
 }

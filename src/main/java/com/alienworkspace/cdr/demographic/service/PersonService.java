@@ -2,6 +2,8 @@ package com.alienworkspace.cdr.demographic.service;
 
 import com.alienworkspace.cdr.model.dto.person.PersonDto;
 import com.alienworkspace.cdr.model.helper.RecordVoidRequest;
+import com.alienworkspace.cdr.model.helper.ResponseDto;
+
 import java.util.List;
 
 /**
@@ -48,5 +50,5 @@ public interface PersonService {
      * @param voidRequest the record void request containing the ID of the person to be deleted
      * @return a message indicating the outcome of the deletion
      */
-    String deletePerson(RecordVoidRequest voidRequest);
+    ResponseDto deletePerson(RecordVoidRequest voidRequest);
 }

@@ -3,8 +3,16 @@ package com.alienworkspace.cdr.demographic.controller;
 import com.alienworkspace.cdr.demographic.service.PersonService;
 import com.alienworkspace.cdr.demographic.service.impl.PersonServiceImpl;
 import com.alienworkspace.cdr.model.dto.person.PersonDto;
+import com.alienworkspace.cdr.model.helper.ErrorResponseDto;
 import com.alienworkspace.cdr.model.helper.RecordVoidRequest;
+import com.alienworkspace.cdr.model.helper.ResponseDto;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -18,7 +26,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
 
 /**
  * Controller for managing person-related operations in the demographic module.
@@ -40,6 +47,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("demographic/person")
 @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Dependency injection by Spring; safe to store")
+@Tag(
+        name = "PersonController",
+        description = "CRUD operations related to Person entities"
+)
 public class PersonController {
 
     private final PersonService personService;
@@ -58,6 +69,26 @@ public class PersonController {
      *
      * @return a list of all persons as PersonDto objects
      */
+    @Operation(
+            summary = "Get Persons REST API Endpoint",
+            description = "Endpoint to fetch all persons record."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Http Status OK",
+                    content = @Content(
+                            schema = @Schema(implementation = ResponseDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Http Status INTERNAL_SERVER_ERROR",
+                    content = @Content(
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            )}
+    )
     @GetMapping
     public ResponseEntity<List<PersonDto>> getPersons() {
         return ResponseEntity.ok(personService.getPersons());
@@ -69,6 +100,26 @@ public class PersonController {
      * @param id the ID of the person to retrieve
      * @return the person with the specified ID as a PersonDto
      */
+    @Operation(
+            summary = "Get Person REST API Endpoint",
+            description = "Endpoint to fetch a person's record."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Http Status OK",
+                    content = @Content(
+                            schema = @Schema(implementation = ResponseDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Http Status INTERNAL_SERVER_ERROR",
+                    content = @Content(
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            )}
+    )
     @GetMapping("{id}")
     public ResponseEntity<PersonDto> getPerson(@PathVariable("id") Long id) {
         return ResponseEntity.ok(personService.getPerson(id));
@@ -81,6 +132,26 @@ public class PersonController {
      * @return the added person as a PersonDto
      */
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(
+            summary = "Create Person REST API Endpoint",
+            description = "Endpoint to create new person record."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Http Status OK",
+                    content = @Content(
+                            schema = @Schema(implementation = ResponseDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Http Status INTERNAL_SERVER_ERROR",
+                    content = @Content(
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            )}
+    )
     @PostMapping
     public PersonDto addPerson(@Valid @RequestBody PersonDto personDto) {
         try {
@@ -96,6 +167,33 @@ public class PersonController {
      * @param personDto the data transfer object containing the updated details of the person
      * @return the updated person as a PersonDto
      */
+    @Operation(
+            summary = "Update Person REST API Endpoint",
+            description = "Endpoint to update a person's record."
+    )
+    @ApiResponses({
+        @ApiResponse(
+                responseCode = "200",
+                description = "Http Status OK",
+                content = @Content(
+                        schema = @Schema(implementation = ResponseDto.class)
+                )
+        ),
+        @ApiResponse(
+                responseCode = "404",
+                description = "Http Status NotFound",
+                content = @Content(
+                        schema = @Schema(implementation = ErrorResponseDto.class)
+                )
+        ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Http Status INTERNAL_SERVER_ERROR",
+                    content = @Content(
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            )}
+    )
     @PutMapping
     public ResponseEntity<PersonDto> updatePerson(@RequestBody PersonDto personDto) {
         return ResponseEntity.ok(personService.updatePerson(personDto));
@@ -107,8 +205,35 @@ public class PersonController {
      * @param voidRequest the request containing the ID of the person to delete and the reason for deletion
      * @return a message indicating the successful deletion of the person
      */
+    @Operation(
+            summary = "Delete Person REST API Endpoint",
+            description = "Endpoint to delete a person."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Http Status OK",
+                    content = @Content(
+                            schema = @Schema(implementation = ResponseDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Http Status NotFound",
+                    content = @Content(
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Http Status INTERNAL_SERVER_ERROR",
+                    content = @Content(
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            )}
+    )
     @DeleteMapping
-    public ResponseEntity<String> deletePerson(@RequestBody RecordVoidRequest voidRequest) {
+    public ResponseEntity<ResponseDto> deletePerson(@RequestBody RecordVoidRequest voidRequest) {
         return ResponseEntity.ok(personService.deletePerson(voidRequest));
     }
 }
