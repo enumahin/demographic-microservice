@@ -29,7 +29,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
                 contact = @Contact(
                         name = "Ikechukwu Enumah",
                         email = "enumahin@gmail.com",
-                        url="https://enumahin.com"
+                        url = "https://enumahin.com"
                 ),
                 license = @License(
                         name = "Apache 2.0",

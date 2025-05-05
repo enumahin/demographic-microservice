@@ -157,8 +157,8 @@ public class PersonServiceTest {
                 .gender('F')
                 .build();
         when(personRepository.findByPersonId(any(Long.class))).thenReturn(Optional.of(savedPerson));
-        when(personRepository.save(updatedPerson)).thenReturn(updatedPerson);
-        when(personMapper.personToPersonDto(updatedPerson)).thenReturn(updatedPersonDto);
+        when(personRepository.save(any(Person.class))).thenReturn(updatedPerson);
+        when(personMapper.personToPersonDto(any(Person.class))).thenReturn(updatedPersonDto);
 
         // when
         PersonDto response = personService.updatePerson(personDto);

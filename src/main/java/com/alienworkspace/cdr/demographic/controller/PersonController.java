@@ -73,21 +73,23 @@ public class PersonController {
             summary = "Get Persons REST API Endpoint",
             description = "Endpoint to fetch all persons record."
     )
-    @ApiResponses({
-            @ApiResponse(
+    @ApiResponses(
+            {
+                @ApiResponse(
                     responseCode = "200",
                     description = "Http Status OK",
                     content = @Content(
                             schema = @Schema(implementation = ResponseDto.class)
                     )
-            ),
-            @ApiResponse(
+                ),
+                @ApiResponse(
                     responseCode = "500",
                     description = "Http Status INTERNAL_SERVER_ERROR",
                     content = @Content(
                             schema = @Schema(implementation = ErrorResponseDto.class)
                     )
-            )}
+                )
+            }
     )
     @GetMapping
     public ResponseEntity<List<PersonDto>> getPersons() {
@@ -104,21 +106,23 @@ public class PersonController {
             summary = "Get Person REST API Endpoint",
             description = "Endpoint to fetch a person's record."
     )
-    @ApiResponses({
-            @ApiResponse(
+    @ApiResponses(
+            {
+                @ApiResponse(
                     responseCode = "200",
                     description = "Http Status OK",
                     content = @Content(
                             schema = @Schema(implementation = ResponseDto.class)
                     )
-            ),
-            @ApiResponse(
+                ),
+                @ApiResponse(
                     responseCode = "500",
                     description = "Http Status INTERNAL_SERVER_ERROR",
                     content = @Content(
                             schema = @Schema(implementation = ErrorResponseDto.class)
                     )
-            )}
+                )
+            }
     )
     @GetMapping("{id}")
     public ResponseEntity<PersonDto> getPerson(@PathVariable("id") Long id) {
@@ -136,29 +140,27 @@ public class PersonController {
             summary = "Create Person REST API Endpoint",
             description = "Endpoint to create new person record."
     )
-    @ApiResponses({
-            @ApiResponse(
+    @ApiResponses(
+            {
+                @ApiResponse(
                     responseCode = "200",
                     description = "Http Status OK",
                     content = @Content(
                             schema = @Schema(implementation = ResponseDto.class)
                     )
-            ),
-            @ApiResponse(
+                ),
+                @ApiResponse(
                     responseCode = "500",
                     description = "Http Status INTERNAL_SERVER_ERROR",
                     content = @Content(
                             schema = @Schema(implementation = ErrorResponseDto.class)
                     )
-            )}
+                )
+            }
     )
     @PostMapping
     public PersonDto addPerson(@Valid @RequestBody PersonDto personDto) {
-        try {
-            return personService.addPerson(personDto);
-        } catch (Exception e) {
-            throw new RuntimeException("Error adding person", e);
-        }
+        return personService.addPerson(personDto);
     }
 
     /**
@@ -171,28 +173,30 @@ public class PersonController {
             summary = "Update Person REST API Endpoint",
             description = "Endpoint to update a person's record."
     )
-    @ApiResponses({
-        @ApiResponse(
-                responseCode = "200",
-                description = "Http Status OK",
-                content = @Content(
-                        schema = @Schema(implementation = ResponseDto.class)
-                )
-        ),
-        @ApiResponse(
-                responseCode = "404",
-                description = "Http Status NotFound",
-                content = @Content(
-                        schema = @Schema(implementation = ErrorResponseDto.class)
-                )
-        ),
-            @ApiResponse(
+    @ApiResponses(
+            {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Http Status OK",
+                        content = @Content(
+                                schema = @Schema(implementation = ResponseDto.class)
+                        )
+                ),
+                @ApiResponse(
+                        responseCode = "404",
+                        description = "Http Status NotFound",
+                        content = @Content(
+                                schema = @Schema(implementation = ErrorResponseDto.class)
+                        )
+                ),
+                @ApiResponse(
                     responseCode = "500",
                     description = "Http Status INTERNAL_SERVER_ERROR",
                     content = @Content(
                             schema = @Schema(implementation = ErrorResponseDto.class)
                     )
-            )}
+                )
+            }
     )
     @PutMapping
     public ResponseEntity<PersonDto> updatePerson(@RequestBody PersonDto personDto) {
@@ -209,28 +213,30 @@ public class PersonController {
             summary = "Delete Person REST API Endpoint",
             description = "Endpoint to delete a person."
     )
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Http Status OK",
-                    content = @Content(
-                            schema = @Schema(implementation = ResponseDto.class)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Http Status NotFound",
-                    content = @Content(
-                            schema = @Schema(implementation = ErrorResponseDto.class)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = "Http Status INTERNAL_SERVER_ERROR",
-                    content = @Content(
-                            schema = @Schema(implementation = ErrorResponseDto.class)
-                    )
-            )}
+    @ApiResponses(
+            {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Http Status OK",
+                        content = @Content(
+                                schema = @Schema(implementation = ResponseDto.class)
+                        )
+                ),
+                @ApiResponse(
+                        responseCode = "404",
+                        description = "Http Status NotFound",
+                        content = @Content(
+                                schema = @Schema(implementation = ErrorResponseDto.class)
+                        )
+                ),
+                @ApiResponse(
+                        responseCode = "500",
+                        description = "Http Status INTERNAL_SERVER_ERROR",
+                        content = @Content(
+                                schema = @Schema(implementation = ErrorResponseDto.class)
+                        )
+                )
+            }
     )
     @DeleteMapping
     public ResponseEntity<ResponseDto> deletePerson(@RequestBody RecordVoidRequest voidRequest) {

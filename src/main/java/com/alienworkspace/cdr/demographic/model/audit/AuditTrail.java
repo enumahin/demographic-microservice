@@ -5,7 +5,9 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.data.annotation.CreatedBy;
@@ -34,6 +36,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Getter
 @Setter
 @ToString
+@NoArgsConstructor
+@AllArgsConstructor
 public class AuditTrail {
 
     @CreatedBy
@@ -64,4 +68,6 @@ public class AuditTrail {
     private String voidReason;
 
     private String uuid = UUID.randomUUID().toString();
+
+
 }

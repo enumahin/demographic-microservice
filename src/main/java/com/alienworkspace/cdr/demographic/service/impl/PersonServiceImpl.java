@@ -7,10 +7,9 @@ import com.alienworkspace.cdr.demographic.repository.PersonRepository;
 import com.alienworkspace.cdr.demographic.service.PersonService;
 import com.alienworkspace.cdr.model.dto.person.PersonDto;
 import com.alienworkspace.cdr.model.helper.RecordVoidRequest;
+import com.alienworkspace.cdr.model.helper.ResponseDto;
 import java.time.LocalDateTime;
 import java.util.List;
-
-import com.alienworkspace.cdr.model.helper.ResponseDto;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

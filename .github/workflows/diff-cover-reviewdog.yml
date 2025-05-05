@@ -1,0 +1,51 @@
+name: Diff-Cover with Reviewdog
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  coverage-review:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Required for git diff
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+
+      - name: Build and generate JaCoCo report
+        run: mvn verify
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install diff-cover
+        run: pip install diff-cover
+
+      - name: Install reviewdog
+        run: |
+          curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b /usr/local/bin
+
+      - name: Run diff-cover and pipe to reviewdog
+        run: |
+          diff-cover target/site/jacoco/jacoco.xml \
+            --compare-branch origin/master \
+            --html-report diff-cover.html \
+            --violations-report diff-cover.txt
+
+          cat diff-cover.txt | reviewdog -efm="%f:%l %m" \
+            -name="diff-cover" \
+            -reporter=github-pr-review \
+            -fail-on-error=false \
+            -level=warning
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -84,7 +84,12 @@
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
-
+        <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>33.4.8-jre</version>
+        </dependency>
         <!-- Lombok-MapStruct Binding -->
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -229,7 +234,7 @@
                                         <limit>
                                             <counter>LINE</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.60</minimum> <!-- 80% minimum line coverage -->
+                                            <minimum>0.80</minimum> <!-- 80% minimum line coverage -->
                                         </limit>
                                     </limits>
                                 </rule>

@@ -3,7 +3,6 @@ package com.alienworkspace.cdr.demographic.service;
 import com.alienworkspace.cdr.model.dto.person.PersonDto;
 import com.alienworkspace.cdr.model.helper.RecordVoidRequest;
 import com.alienworkspace.cdr.model.helper.ResponseDto;
-
 import java.util.List;
 
 /**

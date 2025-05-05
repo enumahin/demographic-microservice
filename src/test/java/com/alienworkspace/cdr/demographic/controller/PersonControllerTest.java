@@ -1,7 +1,6 @@
 package com.alienworkspace.cdr.demographic.controller;
 
 import com.alienworkspace.cdr.demographic.exception.ResourceNotFoundException;
-import com.alienworkspace.cdr.demographic.repository.PersonRepository;
 import com.alienworkspace.cdr.demographic.service.impl.PersonServiceImpl;
 import com.alienworkspace.cdr.model.dto.person.PersonDto;
 import com.alienworkspace.cdr.model.helper.RecordVoidRequest;
@@ -42,9 +41,6 @@ public class PersonControllerTest {
     private ObjectMapper objectMapper;
 
     private PersonDto.PersonDtoBuilder personDtoBuilder;
-
-    @MockitoBean
-    private PersonRepository personRepository;
 
     @BeforeEach
     void setup() {
