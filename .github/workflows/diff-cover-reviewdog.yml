@@ -3,7 +3,7 @@ name: Diff-Cover with Reviewdog
 on:
   pull_request:
     branches:
-      - main
+      - master
 
 jobs:
   coverage-review:
