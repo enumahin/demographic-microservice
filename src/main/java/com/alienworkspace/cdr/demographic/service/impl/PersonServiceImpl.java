@@ -140,7 +140,7 @@ public class PersonServiceImpl implements PersonService {
                     person.setVoided(true);
                     person.setVoidReason(reason);
                     person.setVoidedAt(LocalDateTime.now());
-                    person.setVoidedBy(1L); // Set the ID of the user who voided the record if available, else set to 1;
+                    person.setVoidedBy(1L);
                     personRepository.save(person);
                     return new ResponseDto(200, "Person deleted successfully");
                 }).orElseThrow(() -> new ResourceNotFoundException(String.format("PersonId of %d not found", id)));
