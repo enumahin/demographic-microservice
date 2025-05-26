@@ -1,6 +1,7 @@
 package com.alienworkspace.cdr.demographic.controller;
 
 import com.alienworkspace.cdr.demographic.exception.ResourceNotFoundException;
+import com.alienworkspace.cdr.demographic.helpers.Constants;
 import com.alienworkspace.cdr.demographic.service.impl.PersonServiceImpl;
 import com.alienworkspace.cdr.model.dto.person.PersonDto;
 import com.alienworkspace.cdr.model.helper.RecordVoidRequest;
@@ -62,7 +63,7 @@ public class PersonControllerTest {
         given(personService.addPerson(any(PersonDto.class))).willReturn(personDto);
 
         // when
-        ResultActions response = mockMvc.perform(post("/demographic/person").contentType(MediaType.APPLICATION_JSON)
+        ResultActions response = mockMvc.perform(post(Constants.PERSON_BASE_URL).contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(personDto)));
 
         // then
@@ -83,14 +84,15 @@ public class PersonControllerTest {
                 .gender('F')
                 .birthDate(LocalDate.parse("1990-01-01"))
                 .build();
-        given(personService.updatePerson(any(PersonDto.class))).willReturn(personDto);
+        given(personService.updatePerson(any(Long.class), any(PersonDto.class))).willReturn(personDto);
 
         // when
-        ResultActions response = mockMvc.perform(put("/demographic/person").contentType(MediaType.APPLICATION_JSON)
+        ResultActions response = mockMvc.perform(put(Constants.PERSON_BASE_URL + "/{id}", personDto.getPersonId())
+                .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(personDto)));
 
         // then
-        verify(personService).updatePerson(personDto);
+        verify(personService).updatePerson(personDto.getPersonId(), personDto);
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.personId").value(1L))
@@ -107,19 +109,23 @@ public class PersonControllerTest {
                 .gender('F')
                 .birthDate(LocalDate.parse("1990-01-01"))
                 .build();
-        given(personService.updatePerson(personDto)).willThrow(
+        given(personService.updatePerson(personDto.getPersonId(), personDto)).willThrow(
                 new ResourceNotFoundException("ResourceNotFoundException: Person not found"));
 
         // when
-        ResultActions response = mockMvc.perform(put("/demographic/person").contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(personDto)));
+        ResultActions response = mockMvc.perform(
+                put(Constants.PERSON_BASE_URL + "/{id}", personDto.getPersonId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(personDto)));
 
         // then
-        verify(personService).updatePerson(personDto);
+        verify(personService).updatePerson(personDto.getPersonId(), personDto);
         response.andDo(print())
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.apiPath", CoreMatchers.containsStringIgnoringCase("demographic/person")))
-                .andExpect(jsonPath("$.errorMessage", CoreMatchers.containsStringIgnoringCase ("ResourceNotFoundException")))
+                .andExpect(jsonPath("$.apiPath",
+                        CoreMatchers.containsStringIgnoringCase(Constants.PERSON_BASE_URL)))
+                .andExpect(jsonPath("$.errorMessage",
+                        CoreMatchers.containsStringIgnoringCase ("ResourceNotFoundException")))
                 .andExpect(jsonPath("$.errorCode").value(404));
     }
 
@@ -136,7 +142,8 @@ public class PersonControllerTest {
         given(personService.getPerson(any(Long.class))).willReturn(personDto);
 
         // when
-        ResultActions response = mockMvc.perform(get("/demographic/person/{personId}", 1L)
+        ResultActions response = mockMvc.perform(
+                get(Constants.PERSON_BASE_URL + "/{personId}", personDto.getPersonId())
                         .contentType(MediaType.APPLICATION_JSON));
 
         // then
@@ -161,7 +168,7 @@ public class PersonControllerTest {
         given(personService.getPersons()).willReturn(List.of(personDto));
 
         // when
-        ResultActions response = mockMvc.perform(get("/demographic/person", 1L)
+        ResultActions response = mockMvc.perform(get(Constants.PERSON_BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON));
 
         // then
@@ -177,19 +184,19 @@ public class PersonControllerTest {
     @Test
     public void testDeletePerson() throws Exception {
         // given
-        given(personService.deletePerson(any(RecordVoidRequest.class))).willReturn(new ResponseDto(200, "Person deleted successfully"));
+        given(personService.deletePerson(any(Long.class), any(RecordVoidRequest.class)))
+                .willReturn(new ResponseDto(200, "Person deleted successfully"));
         RecordVoidRequest recordVoidRequest = RecordVoidRequest.builder()
-                .resourceId(String.valueOf(1L))
-                .resourceUUID(null)
                 .voidReason("test")
                 .build();
 
         // when
-        ResultActions response = mockMvc.perform(delete("/demographic/person").contentType(MediaType.APPLICATION_JSON)
+        ResultActions response = mockMvc.perform(delete(Constants.PERSON_BASE_URL + "/{id}", 1)
+                .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(recordVoidRequest)));
 
         // then
-        verify(personService).deletePerson(recordVoidRequest);
+        verify(personService).deletePerson(1, recordVoidRequest);
         response.andDo(print())
                 .andExpect(status().isOk());
     }

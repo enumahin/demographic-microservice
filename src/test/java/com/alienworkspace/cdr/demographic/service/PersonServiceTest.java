@@ -161,7 +161,7 @@ public class PersonServiceTest {
         when(personMapper.personToPersonDto(any(Person.class))).thenReturn(updatedPersonDto);
 
         // when
-        PersonDto response = personService.updatePerson(personDto);
+        PersonDto response = personService.updatePerson(personDto.getPersonId(), personDto);
 
         // then
         assertEquals(updatedPersonDto, response);
@@ -180,7 +180,8 @@ public class PersonServiceTest {
         when(personRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         // when
-        assertThrows(ResourceNotFoundException.class, () -> personService.updatePerson(personDtoBuilder.personId(1L).build()));
+        assertThrows(ResourceNotFoundException.class, () -> personService.updatePerson(1L, personDtoBuilder.personId(1L)
+                .build()));
 
         // then - throw exception
         verify(personRepository, never()).save(any(Person.class));
@@ -190,7 +191,7 @@ public class PersonServiceTest {
     public void testDeletePerson() {
         // given
         RecordVoidRequest recordVoidRequest = RecordVoidRequest.builder()
-                .resourceId(String.valueOf(1L))
+                .voidReason("Test reason")
                 .build();
 
         Person updatedPerson = personBuilder
@@ -206,7 +207,7 @@ public class PersonServiceTest {
         when(personRepository.save(updatedPerson)).thenReturn(updatedPerson);
 
         // when
-        ResponseDto response = personService.deletePerson(recordVoidRequest);
+        ResponseDto response = personService.deletePerson(1, recordVoidRequest);
 
         // then
         assertEquals("Person deleted successfully", response.getStatusMessage());
@@ -217,12 +218,12 @@ public class PersonServiceTest {
     public void testDeleteNonExistingPerson() {
         // given
         RecordVoidRequest recordVoidRequest = RecordVoidRequest.builder()
-                .resourceId(String.valueOf(1L))
+                .voidReason("Test reason")
                 .build();
         when(personRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         // when
-        assertThrows(ResourceNotFoundException.class, () -> personService.deletePerson(recordVoidRequest));
+        assertThrows(ResourceNotFoundException.class, () -> personService.deletePerson(1, recordVoidRequest));
 
         // then - throw exception
         verify(personRepository, never()).save(any(Person.class));

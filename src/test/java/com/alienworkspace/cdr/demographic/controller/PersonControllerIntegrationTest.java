@@ -1,5 +1,6 @@
 package com.alienworkspace.cdr.demographic.controller;
 
+import com.alienworkspace.cdr.demographic.helpers.Constants;
 import com.alienworkspace.cdr.demographic.integration.AbstractionContainerBaseTest;
 import com.alienworkspace.cdr.demographic.repository.PersonRepository;
 import com.alienworkspace.cdr.model.dto.person.PersonDto;
@@ -54,7 +55,7 @@ public class PersonControllerIntegrationTest extends AbstractionContainerBaseTes
                 .build();
 
         // when
-        ResultActions response = mockMvc.perform(post("/demographic/person").contentType(MediaType.APPLICATION_JSON)
+        ResultActions response = mockMvc.perform(post(Constants.PERSON_BASE_URL).contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(personDto)));
 
         // then
@@ -73,7 +74,8 @@ public class PersonControllerIntegrationTest extends AbstractionContainerBaseTes
                 .build();
 
         // when
-        ResultActions resultActions = mockMvc.perform(post("/demographic/person").contentType(MediaType.APPLICATION_JSON)
+        ResultActions resultActions = mockMvc.perform(post(Constants.PERSON_BASE_URL)
+                .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(personDto)));
 
         String responseEntity = resultActions.andReturn().getResponse().getContentAsString();
@@ -83,7 +85,8 @@ public class PersonControllerIntegrationTest extends AbstractionContainerBaseTes
                 .personId(savedPerson.getPersonId())
                 .gender('F')
                 .build();
-        ResultActions response = mockMvc.perform(put("/demographic/person").contentType(MediaType.APPLICATION_JSON)
+        ResultActions response = mockMvc.perform(put(Constants.PERSON_BASE_URL + "/{id}", savedPerson.getPersonId())
+                .contentType("application/json").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updatePerson)));
 
         // then
@@ -103,13 +106,13 @@ public class PersonControllerIntegrationTest extends AbstractionContainerBaseTes
                 .build();
 
         // when
-        ResultActions resultActions = mockMvc.perform(post("/demographic/person").contentType(MediaType.APPLICATION_JSON)
+        ResultActions resultActions = mockMvc.perform(post(Constants.PERSON_BASE_URL).contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(personDto)));
 
         String responseEntity = resultActions.andReturn().getResponse().getContentAsString();
         PersonDto savedPerson = objectMapper.readValue(responseEntity, PersonDto.class);
 
-        ResultActions response = mockMvc.perform(get("/demographic/person/" + savedPerson.getPersonId()));
+        ResultActions response = mockMvc.perform(get(Constants.PERSON_BASE_URL + "/{id}", savedPerson.getPersonId()));
 
         // then
         response.andDo(print())
@@ -131,12 +134,12 @@ public class PersonControllerIntegrationTest extends AbstractionContainerBaseTes
                 .build();
 
         // when
-        mockMvc.perform(post("/demographic/person").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post(Constants.PERSON_BASE_URL).contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(personDto)));
-        mockMvc.perform(post("/demographic/person").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post(Constants.PERSON_BASE_URL).contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(personDto2)));
 
-        ResultActions response = mockMvc.perform(get("/demographic/person"));
+        ResultActions response = mockMvc.perform(get(Constants.PERSON_BASE_URL));
 
         // then
         response.andDo(print())
@@ -152,19 +155,23 @@ public class PersonControllerIntegrationTest extends AbstractionContainerBaseTes
                 .build();
 
         // when
-        ResultActions resultActions = mockMvc.perform(post("/demographic/person").contentType(MediaType.APPLICATION_JSON)
+        ResultActions resultActions = mockMvc.perform(
+                post(Constants.PERSON_BASE_URL)
+                .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(personDto)));
 
         String responseEntity = resultActions.andReturn().getResponse().getContentAsString();
         PersonDto savedPerson = objectMapper.readValue(responseEntity, PersonDto.class);
         RecordVoidRequest recordVoidRequest = RecordVoidRequest.builder()
-                .resourceId(String.valueOf(savedPerson.getPersonId()))
+                .voidReason("test")
                 .build();
 
-        mockMvc.perform(delete("/demographic/person").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(delete(Constants.PERSON_BASE_URL + "/{id}", savedPerson.getPersonId())
+                .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(recordVoidRequest)));
 
-        ResultActions response = mockMvc.perform(get("/demographic/person/" + savedPerson.getPersonId()));
+        ResultActions response = mockMvc.perform(
+                get(Constants.PERSON_BASE_URL + "/{id}", savedPerson.getPersonId()));
 
         // then
         response.andDo(print())
@@ -182,10 +189,11 @@ public class PersonControllerIntegrationTest extends AbstractionContainerBaseTes
 
         // when
         RecordVoidRequest recordVoidRequest = RecordVoidRequest.builder()
-                .resourceId(String.valueOf(1L))
+                .voidReason("Test void reason")
                 .build();
 
-        ResultActions response = mockMvc.perform(delete("/demographic/person").contentType(MediaType.APPLICATION_JSON)
+        ResultActions response = mockMvc.perform(delete(Constants.PERSON_BASE_URL + "/{id}", 1L)
+                .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(recordVoidRequest)));
 
         // then
@@ -195,5 +203,4 @@ public class PersonControllerIntegrationTest extends AbstractionContainerBaseTes
                 .andExpect(jsonPath("$.errorMessage")
                         .value(CoreMatchers.containsStringIgnoringCase("ResourceNotFoundException")));
     }
-
 }

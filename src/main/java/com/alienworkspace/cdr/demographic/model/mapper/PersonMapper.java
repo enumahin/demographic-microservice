@@ -15,7 +15,7 @@ import org.mapstruct.factory.Mappers;
 public interface PersonMapper {
 
     /** The singleton instance of the PersonMapper class, needed when you want to call the mapping methods
-     * directly without DI For example, PersonMapper.INSTANCE.personDtoToPerson(personDto).
+     * directly without DI For example, PersonMapper.INSTANCE.personDtoToPerson (personDto).
      */
     PersonMapper INSTANCE = Mappers.getMapper(PersonMapper.class);
 

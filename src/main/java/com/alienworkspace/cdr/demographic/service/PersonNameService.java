@@ -31,13 +31,14 @@ public interface PersonNameService {
     /**
      * Deletes a person name by its ID.
      *
-     * <p>This method accepts a {@link RecordVoidRequest} that contains the ID of the person name to be deleted
+     * <p>This method accepts a {@link RecordVoidRequest} that contains the reason for the deletion
      * and returns a {@link String} indicating the result of the deletion.
      *
+     * @param personNameId the ID of the person name to be deleted
      * @param resourceVoidRequest the request containing the ID of the person name to delete
      * @return a String indicating the outcome of the deletion
      */
-    String deletePersonName(RecordVoidRequest resourceVoidRequest);
+    String deletePersonName(long personNameId, RecordVoidRequest resourceVoidRequest);
 
     /**
      * Retrieves a person name by its ID.

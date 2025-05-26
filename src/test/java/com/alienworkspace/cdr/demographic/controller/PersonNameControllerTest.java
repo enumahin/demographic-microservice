@@ -1,8 +1,6 @@
 package com.alienworkspace.cdr.demographic.controller;
 
-import com.alienworkspace.cdr.demographic.model.PersonName;
-import com.alienworkspace.cdr.demographic.model.mapper.PersonNameMapper;
-import com.alienworkspace.cdr.demographic.repository.PersonNameRepository;
+import com.alienworkspace.cdr.demographic.helpers.Constants;
 import com.alienworkspace.cdr.demographic.service.impl.PersonNameServiceImpl;
 import com.alienworkspace.cdr.model.dto.person.PersonNameDto;
 import com.alienworkspace.cdr.model.helper.RecordVoidRequest;
@@ -20,7 +18,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -32,8 +29,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(PersonNameController.class)
 public class PersonNameControllerTest {
-
-    private static final String BASE_URL = "/demographic/person-name";
 
     @Autowired
     private MockMvc mockMvc;
@@ -66,7 +61,7 @@ public class PersonNameControllerTest {
         given(personNameService.addPersonName(any(PersonNameDto.class))).willReturn(mappedResponse);
 
         // when
-        ResultActions response = mockMvc.perform(post(BASE_URL).contentType("application/json")
+        ResultActions response = mockMvc.perform(post(Constants.PERSON_NAME_BASE_URL).contentType("application/json")
                 .content(objectMapper.writeValueAsString(personNameDto)));
 
         // then
@@ -93,9 +88,9 @@ public class PersonNameControllerTest {
         given(personNameService.findPersonName(any(Long.class))).willReturn(mappedResponse);
 
         // when
-        mockMvc.perform(post(BASE_URL).contentType("application/json")
+        mockMvc.perform(post(Constants.PERSON_NAME_BASE_URL).contentType("application/json")
                 .content(objectMapper.writeValueAsString(personNameDto)));
-        ResultActions response = mockMvc.perform(get(BASE_URL +"/"+1L));
+        ResultActions response = mockMvc.perform(get(Constants.PERSON_NAME_BASE_URL +"/"+1L));
 
         // then
         response.andDo(print())
@@ -128,9 +123,9 @@ public class PersonNameControllerTest {
                 .willReturn(List.of(mappedResponse, mappedResponse2));
 
         // when
-        mockMvc.perform(post(BASE_URL).contentType("application/json")
+        mockMvc.perform(post(Constants.PERSON_NAME_BASE_URL).contentType("application/json")
                 .content(objectMapper.writeValueAsString(personNameDto)));
-        ResultActions response = mockMvc.perform(get(BASE_URL +"/"+1L+"/names"));
+        ResultActions response = mockMvc.perform(get(Constants.PERSON_NAME_BASE_URL +"/"+1L+"/names"));
 
         // then
         response.andDo(print())
@@ -157,15 +152,17 @@ public class PersonNameControllerTest {
         mappedResponse.setVoidedBy(1L);
         mappedResponse.setVoidReason("test");
 
-        given(personNameService.deletePersonName(any(RecordVoidRequest.class))).willReturn("Person name successful deleted.");
+        given(personNameService.deletePersonName(any(Long.class), any(RecordVoidRequest.class)))
+                .willReturn("Person name successful deleted.");
         given(personNameService.findPersonName(any(Long.class))).willReturn(mappedResponse);
 
         // when
-        RecordVoidRequest recordVoidRequest = RecordVoidRequest.builder().resourceId(String.valueOf(1L)).voidReason("test").build();
+        RecordVoidRequest recordVoidRequest = RecordVoidRequest.builder().voidReason("test").build();
 
-        ResultActions deleteResponse = mockMvc.perform(delete(BASE_URL).contentType("application/json")
+        ResultActions deleteResponse = mockMvc.perform(delete(Constants.PERSON_NAME_BASE_URL + "/{id}", 1L).contentType("application/json")
                 .content(objectMapper.writeValueAsString(recordVoidRequest)));
-        ResultActions response = mockMvc.perform(get(BASE_URL+ "/" + 1L).contentType("application/json"));
+        ResultActions response = mockMvc.perform(get(Constants.PERSON_NAME_BASE_URL+ "/{id}", 1L)
+                .contentType("application/json"));
 
         // then
         deleteResponse
@@ -183,7 +180,7 @@ public class PersonNameControllerTest {
                 .andExpect(jsonPath("$.voidedAt").value(CoreMatchers.notNullValue()))
                 .andExpect(jsonPath("$.voidReason").value(CoreMatchers.notNullValue()))
                 .andExpect(jsonPath("$.preferred").value(false));
-        verify(personNameService).deletePersonName(eq(recordVoidRequest));
+        verify(personNameService).deletePersonName(eq(1L), eq(recordVoidRequest));
         verify(personNameService).findPersonName(1L);
         verifyNoMoreInteractions(personNameService);
     }

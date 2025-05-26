@@ -3,7 +3,7 @@ name: Diff-Cover with Reviewdog
 on:
   pull_request:
     branches:
-      - main
+      - master
 
 jobs:
   coverage-review:
@@ -18,7 +18,23 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v3
         with:
+          distribution: 'temurin'
           java-version: '17'
+
+      - name: Configure Maven settings
+        run: |
+          mkdir -p ~/.m2
+          cat > ~/.m2/settings.xml <<EOF
+          <settings>
+            <servers>
+              <server>
+                <id>github</id>
+                <username>enumahin</username>
+                <password>${{ secrets.GH_PAT }}</password>
+              </server>
+            </servers>
+          </settings>
+          EOF
 
       - name: Build and generate JaCoCo report
         run: mvn verify

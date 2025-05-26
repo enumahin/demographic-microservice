@@ -54,7 +54,8 @@ public class PersonNameServiceIntegrationTest extends AbstractionContainerBaseTe
         // Add the first person name and expect it to be preferred even when preferred in not set
         PersonNameDto savedPerson = personNameService.addPersonName(personNameDto);
         // add second person name with preferred not set and expect preferred not to change
-        PersonNameDto savedPerson2 = personNameService.addPersonName(personNameDtoBuilder.firstName("Queen").lastName("Lizzy").build());
+        PersonNameDto savedPerson2 = personNameService.addPersonName(personNameDtoBuilder.firstName("Queen")
+                .lastName("Lizzy").build());
         // Add thirst person name a preferred
         PersonNameDto savedPerson3 = personNameService.addPersonName(personNameDtoBuilder.preferred(true).build());
         // Get preferred and expect it to be the last added name
@@ -118,16 +119,16 @@ public class PersonNameServiceIntegrationTest extends AbstractionContainerBaseTe
         PersonNameDto savedPerson2 = personNameService.addPersonName(personNameDto);
 
         RecordVoidRequest recordVoidRequest = RecordVoidRequest.builder()
-                .resourceId(savedPerson.getPersonNameId().toString())
                 .voidReason("test")
                 .build();
 
-        personNameService.deletePersonName(recordVoidRequest);
+        personNameService.deletePersonName(savedPerson.getPersonNameId(), recordVoidRequest);
 
         List<PersonNameDto> voided = personNameService.findPersonNamesByPersonId(savedPerson.getPersonId(), true);
         List<PersonNameDto> notVoided = personNameService.findPersonNamesByPersonId(savedPerson.getPersonId());
 
-        List<PersonNameDto> personNames = personNameService.findPersonNamesByPersonIdBothVoided(savedPerson2.getPersonId());
+        List<PersonNameDto> personNames = personNameService.findPersonNamesByPersonIdBothVoided(
+                savedPerson2.getPersonId());
 
         // then
         assertEquals(2, personNames.size());

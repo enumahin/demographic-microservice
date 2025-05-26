@@ -86,8 +86,8 @@ public class PersonNameServiceTest {
 
         // then
         assertNotNull(savedPersonName);
-        assertEquals(1L,savedPersonName.getPersonId());
-        assertEquals(1L,savedPersonName.getPersonNameId());
+        assertEquals(1L, savedPersonName.getPersonId());
+        assertEquals(1L, savedPersonName.getPersonNameId());
         assertEquals(personNameDto.getFirstName(), savedPersonName.getFirstName());
         assertEquals(personNameDto.getLastName(), savedPersonName.getLastName());
         assertEquals(personNameDto.getPreferred(), savedPersonName.getPreferred());
@@ -297,10 +297,9 @@ public class PersonNameServiceTest {
         given(personNameMapper.personNameToPersonNameDto(any(PersonName.class))).willReturn(personNameDto);
         RecordVoidRequest recordVoidRequest = new RecordVoidRequest();
         recordVoidRequest.setVoidReason("test");
-        recordVoidRequest.setResourceId(String.valueOf(1L));
 
         // when
-        String response = personNameService.deletePersonName(recordVoidRequest);
+        String response = personNameService.deletePersonName(1L, recordVoidRequest);
         String expectedResponse = "Person name deleted successfully";
         PersonNameDto voidedPerson = personNameService.findPersonName(1L);
 
@@ -331,8 +330,8 @@ public class PersonNameServiceTest {
         // when
         RecordVoidRequest recordVoidRequest = new RecordVoidRequest();
         recordVoidRequest.setVoidReason("test");
-        recordVoidRequest.setResourceId(String.valueOf(1L));
-        assertThrows(ResourceNotFoundException.class, () -> personNameService.deletePersonName(recordVoidRequest));
+        assertThrows(ResourceNotFoundException.class, () ->
+                personNameService.deletePersonName(1L, recordVoidRequest));
 
         // then
         verify(personNameRepository).findByPersonNameId(eq(personNameDto.getPersonNameId()));
@@ -353,10 +352,9 @@ public class PersonNameServiceTest {
 
         RecordVoidRequest recordVoidRequest = new RecordVoidRequest();
         recordVoidRequest.setVoidReason("test");
-        recordVoidRequest.setResourceId(String.valueOf(1L));
 
         // when
-        assertThrows(RuntimeException.class, () -> personNameService.deletePersonName(recordVoidRequest));
+        assertThrows(RuntimeException.class, () -> personNameService.deletePersonName(1L,recordVoidRequest));
 
         // then
         verify(personNameRepository).findByPersonNameId(eq(1L));

@@ -1,5 +1,6 @@
 package com.alienworkspace.cdr.demographic.controller;
 
+import com.alienworkspace.cdr.demographic.helpers.Constants;
 import com.alienworkspace.cdr.demographic.service.PersonService;
 import com.alienworkspace.cdr.demographic.service.impl.PersonServiceImpl;
 import com.alienworkspace.cdr.model.dto.person.PersonDto;
@@ -45,7 +46,7 @@ import org.springframework.web.bind.annotation.RestController;
  * <p>Author: Codeium Engineering Team</p>
  */
 @RestController
-@RequestMapping("demographic/person")
+@RequestMapping(Constants.PERSON_BASE_URL)
 @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Dependency injection by Spring; safe to store")
 @Tag(
         name = "PersonController",
@@ -198,9 +199,9 @@ public class PersonController {
                 )
             }
     )
-    @PutMapping
-    public ResponseEntity<PersonDto> updatePerson(@RequestBody PersonDto personDto) {
-        return ResponseEntity.ok(personService.updatePerson(personDto));
+    @PutMapping("/{id}")
+    public ResponseEntity<PersonDto> updatePerson(@PathVariable("id") Long id, @RequestBody PersonDto personDto) {
+        return ResponseEntity.ok(personService.updatePerson(id, personDto));
     }
 
     /**
@@ -238,8 +239,9 @@ public class PersonController {
                 )
             }
     )
-    @DeleteMapping
-    public ResponseEntity<ResponseDto> deletePerson(@RequestBody RecordVoidRequest voidRequest) {
-        return ResponseEntity.ok(personService.deletePerson(voidRequest));
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ResponseDto> deletePerson(@PathVariable("id") long id,
+                                                    @RequestBody RecordVoidRequest voidRequest) {
+        return ResponseEntity.ok(personService.deletePerson(id, voidRequest));
     }
 }

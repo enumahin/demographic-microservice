@@ -84,7 +84,7 @@ public class PersonServiceImpl implements PersonService {
      * @return a PersonDto representation of the updated person
      */
     @Override
-    public PersonDto updatePerson(PersonDto personDto) {
+    public PersonDto updatePerson(long personId, PersonDto personDto) {
         if (personDto.getPersonId() == null) {
             throw new ResourceNotFoundException("PersonId can not be null.");
         }
@@ -128,12 +128,12 @@ public class PersonServiceImpl implements PersonService {
     /**
      * Deletes a person by ID.
      *
+     * @param id the ID of the person to be deleted
      * @param recordVoidRequest the record void request containing the ID of the person to be deleted
      * @return a message indicating the outcome of the deletion
      */
     @Override
-    public ResponseDto deletePerson(RecordVoidRequest recordVoidRequest) {
-        Long id = Long.valueOf(recordVoidRequest.getResourceId());
+    public ResponseDto deletePerson(long id, RecordVoidRequest recordVoidRequest) {
         String reason = recordVoidRequest.getVoidReason();
         return personRepository.findById(id)
                 .map(person -> {
