@@ -38,16 +38,18 @@ public interface PersonService {
     /**
      * Updates an existing person in the system.
      *
+     * @param personId the ID of the person to be updated
      * @param personDto the PersonDto object containing the updated data of the person
      * @return a PersonDto object containing the updated data of the person
      */
-    PersonDto updatePerson(PersonDto personDto);
+    PersonDto updatePerson(long personId, PersonDto personDto);
 
     /**
      * Deletes a person by their ID.
      *
+     * @param personId the ID of the person to be deleted
      * @param voidRequest the record void request containing the ID of the person to be deleted
      * @return a message indicating the outcome of the deletion
      */
-    ResponseDto deletePerson(RecordVoidRequest voidRequest);
+    ResponseDto deletePerson(long personId, RecordVoidRequest voidRequest);
 }

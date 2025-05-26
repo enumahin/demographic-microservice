@@ -1,5 +1,6 @@
 package com.alienworkspace.cdr.demographic.controller;
 
+import com.alienworkspace.cdr.demographic.helpers.Constants;
 import com.alienworkspace.cdr.demographic.service.PersonNameService;
 import com.alienworkspace.cdr.demographic.service.impl.PersonNameServiceImpl;
 import com.alienworkspace.cdr.model.dto.person.PersonNameDto;
@@ -43,7 +44,7 @@ import org.springframework.web.bind.annotation.RestController;
  * <p>Author: Ikenumah (enumahinm@gmail.com)</p>
  */
 @RestController
-@RequestMapping("demographic/person-name")
+@RequestMapping(Constants.PERSON_NAME_BASE_URL)
 @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Dependency injection by Spring; safe to store")
 @Tag(
         name = "PersonNameController",
@@ -214,9 +215,7 @@ public class PersonNameController {
     )
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public PersonNameDto addPerson(@Valid @RequestBody PersonNameDto personNameDto) {
-        PersonNameDto personNameDto1 = personNameService.addPersonName(personNameDto);
-        System.out.println(personNameDto1);
-        return personNameDto1;
+        return personNameService.addPersonName(personNameDto);
     }
 
     /**
@@ -254,12 +253,16 @@ public class PersonNameController {
                     )
             }
     )
-    @DeleteMapping
-    public ResponseEntity<ResponseDto> deletePerson(@RequestBody RecordVoidRequest voidRequest) {
-        return Optional.ofNullable(personNameService.deletePersonName(voidRequest))
+    @DeleteMapping("{id}")
+    public ResponseEntity<ResponseDto> deletePerson(@PathVariable("id") long id,
+                                                    @RequestBody RecordVoidRequest voidRequest) {
+        return Optional.ofNullable(personNameService.deletePersonName(id, voidRequest))
                 .map(response -> new ResponseDto(200, response))
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.badRequest().body(
-                        new ResponseDto(400, "Error Deleting Person Name")));
+                .orElse(
+                        ResponseEntity
+                                .badRequest()
+                                .body(new ResponseDto(400, "Error Deleting Person Name"))
+                );
     }
 }

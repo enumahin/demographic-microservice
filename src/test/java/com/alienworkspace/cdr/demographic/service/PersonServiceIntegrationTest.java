@@ -69,7 +69,7 @@ public class PersonServiceIntegrationTest extends AbstractionContainerBaseTest {
                 .gender('M')
                 .birthDate(LocalDate.parse("2000-01-01"))
                 .build();
-        PersonDto updatedPerson = personService.updatePerson(update);
+        PersonDto updatedPerson = personService.updatePerson(update.getPersonId(), update);
 
         // then
         assertNotEquals(savedPerson.getGender(), updatedPerson.getGender());
@@ -136,10 +136,10 @@ public class PersonServiceIntegrationTest extends AbstractionContainerBaseTest {
         // when
         PersonDto savedPerson = personService.addPerson(personDto);
         RecordVoidRequest request = RecordVoidRequest.builder()
-                .resourceId(String.valueOf(savedPerson.getPersonId()))
+                .voidReason("Test void reason")
                 .build();
 
-        ResponseDto response = personService.deletePerson(request);
+        ResponseDto response = personService.deletePerson(savedPerson.getPersonId(), request);
         PersonDto deletedPerson = personService.getPerson(savedPerson.getPersonId());
 
         // then

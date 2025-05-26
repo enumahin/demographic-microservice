@@ -71,8 +71,8 @@ public class PersonNameServiceImpl implements PersonNameService {
      *                          has more than one name
      */
     @Override
-    public String deletePersonName(RecordVoidRequest resourceVoidRequest) {
-        return personNameRepository.findByPersonNameId(Long.valueOf(resourceVoidRequest.getResourceId()))
+    public String deletePersonName(long id, RecordVoidRequest resourceVoidRequest) {
+        return personNameRepository.findByPersonNameId(id)
                 .map(personName -> {
                     if (personName.isPreferred()) {
                         throw new RuntimeException("Preferred person name can not be deleted.");

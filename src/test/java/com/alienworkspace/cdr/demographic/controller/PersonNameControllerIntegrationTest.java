@@ -1,5 +1,6 @@
 package com.alienworkspace.cdr.demographic.controller;
 
+import com.alienworkspace.cdr.demographic.helpers.Constants;
 import com.alienworkspace.cdr.demographic.integration.AbstractionContainerBaseTest;
 import com.alienworkspace.cdr.demographic.repository.PersonNameRepository;
 import com.alienworkspace.cdr.model.dto.person.PersonNameDto;
@@ -24,9 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 public class PersonNameControllerIntegrationTest extends AbstractionContainerBaseTest {
-
-    private static final String BASE_URL = "/demographic/person-name";
-
+    
     @Autowired
     private MockMvc mockMvc;
 
@@ -55,7 +54,7 @@ public class PersonNameControllerIntegrationTest extends AbstractionContainerBas
                 .build();
 
         // when
-        ResultActions response = mockMvc.perform(post(BASE_URL).contentType(MediaType.APPLICATION_JSON)
+        ResultActions response = mockMvc.perform(post(Constants.PERSON_NAME_BASE_URL).contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(personNameDto)));
 
         // then
@@ -75,13 +74,13 @@ public class PersonNameControllerIntegrationTest extends AbstractionContainerBas
                 .build();
 
         // when
-        ResultActions resultActions = mockMvc.perform(post(BASE_URL).contentType(MediaType.APPLICATION_JSON)
+        ResultActions resultActions = mockMvc.perform(post(Constants.PERSON_NAME_BASE_URL).contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(personNameDto)));
 
         String responseEntity = resultActions.andReturn().getResponse().getContentAsString();
         PersonNameDto savedPersonName = objectMapper.readValue(responseEntity, PersonNameDto.class);
 
-        ResultActions response = mockMvc.perform(get(BASE_URL + "/" + savedPersonName.getPersonNameId()));
+        ResultActions response = mockMvc.perform(get(Constants.PERSON_NAME_BASE_URL + "/" + savedPersonName.getPersonNameId()));
 
         // then
         response.andDo(print())
@@ -104,12 +103,12 @@ public class PersonNameControllerIntegrationTest extends AbstractionContainerBas
                 .build();
 
         // when
-        mockMvc.perform(post(BASE_URL).contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post(Constants.PERSON_NAME_BASE_URL).contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(personNameDto)));
-        mockMvc.perform(post(BASE_URL).contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post(Constants.PERSON_NAME_BASE_URL).contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(personNameDto2)));
 
-        ResultActions response = mockMvc.perform(get(BASE_URL + "/" + personNameDto.getPersonId() + "/names"));
+        ResultActions response = mockMvc.perform(get(Constants.PERSON_NAME_BASE_URL + "/" + personNameDto.getPersonId() + "/names"));
 
         // then
         response.andDo(print())
@@ -125,21 +124,21 @@ public class PersonNameControllerIntegrationTest extends AbstractionContainerBas
                 .build();
 
         // when
-        mockMvc.perform(post(BASE_URL).contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post(Constants.PERSON_NAME_BASE_URL).contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(personNameDto)));
-        ResultActions resultActions = mockMvc.perform(post(BASE_URL).contentType(MediaType.APPLICATION_JSON)
+        ResultActions resultActions = mockMvc.perform(post(Constants.PERSON_NAME_BASE_URL).contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(personNameDto)));
 
         String responseEntity = resultActions.andReturn().getResponse().getContentAsString();
         PersonNameDto savedPersonName = objectMapper.readValue(responseEntity, PersonNameDto.class);
         RecordVoidRequest recordVoidRequest = RecordVoidRequest.builder()
-                .resourceId(String.valueOf(savedPersonName.getPersonNameId()))
+                .voidReason("test")
                 .build();
 
-        mockMvc.perform(delete(BASE_URL).contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(delete(Constants.PERSON_NAME_BASE_URL + "/{id}", savedPersonName.getPersonNameId()).contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(recordVoidRequest)));
 
-        ResultActions response = mockMvc.perform(get(BASE_URL + "/" + savedPersonName.getPersonNameId()));
+        ResultActions response = mockMvc.perform(get(Constants.PERSON_NAME_BASE_URL + "/{id}", savedPersonName.getPersonNameId()));
 
         // then
         response.andDo(print())
@@ -159,10 +158,11 @@ public class PersonNameControllerIntegrationTest extends AbstractionContainerBas
 
         // when
         RecordVoidRequest recordVoidRequest = RecordVoidRequest.builder()
-                .resourceId(String.valueOf(1L))
+                .voidReason("Test void reason")
                 .build();
 
-        ResultActions response = mockMvc.perform(delete(BASE_URL).contentType(MediaType.APPLICATION_JSON)
+        ResultActions response = mockMvc.perform(delete(Constants.PERSON_NAME_BASE_URL + "/{id}", 1L)
+                .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(recordVoidRequest)));
 
         // then
