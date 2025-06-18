@@ -2,7 +2,11 @@ package com.alienworkspace.cdr.demographic.service;
 
 import com.alienworkspace.cdr.demographic.exception.ResourceNotFoundException;
 import com.alienworkspace.cdr.demographic.model.Person;
+import com.alienworkspace.cdr.demographic.model.mapper.PersonAddressMapper;
+import com.alienworkspace.cdr.demographic.model.mapper.PersonAttributeMapper;
 import com.alienworkspace.cdr.demographic.model.mapper.PersonMapper;
+import com.alienworkspace.cdr.demographic.model.mapper.PersonNameMapper;
+import com.alienworkspace.cdr.demographic.repository.PersonAttributeTypeRepository;
 import com.alienworkspace.cdr.demographic.repository.PersonRepository;
 import com.alienworkspace.cdr.demographic.service.impl.PersonServiceImpl;
 import com.alienworkspace.cdr.model.dto.person.PersonDto;
@@ -26,7 +30,15 @@ public class PersonServiceTest {
 
     private PersonRepository personRepository;
 
+    private PersonAttributeTypeRepository  personAttributeTypeRepository;
+
     private PersonMapper personMapper;
+
+    private PersonNameMapper personNameMapper;
+
+    private PersonAddressMapper personAddressMapper;
+
+    private PersonAttributeMapper personAttributeMapper;
 
     private PersonServiceImpl personService;
 
@@ -41,8 +53,13 @@ public class PersonServiceTest {
     @BeforeEach
     public void setup() {
         personRepository = mock(PersonRepository.class);
+        personAttributeTypeRepository = mock(PersonAttributeTypeRepository.class);
         personMapper = mock(PersonMapper.class);
-        personService = new PersonServiceImpl(personRepository, personMapper);
+        personNameMapper = mock(PersonNameMapper.class);
+        personAddressMapper = mock(PersonAddressMapper.class);
+        personAttributeMapper = mock(PersonAttributeMapper.class);
+        personService = new PersonServiceImpl(personRepository, personAttributeTypeRepository, personMapper,
+                personNameMapper, personAddressMapper, personAttributeMapper);
 
         personDtoBuilder = PersonDto.builder()
                 .gender('M')
@@ -101,7 +118,7 @@ public class PersonServiceTest {
     @Test
     public void testGetPerson() {
         // given
-        when(personRepository.findById(any(Long.class))).thenReturn(Optional.of(savedPerson));
+        when(personRepository.findCompleteById(any(Long.class))).thenReturn(Optional.of(savedPerson));
         when(personMapper.personToPersonDto(savedPerson)).thenReturn(personDto);
 
         // when
@@ -131,7 +148,7 @@ public class PersonServiceTest {
     @Test
     public void testGetPersons() {
         // given
-        when(personRepository.findAll()).thenReturn(List.of(savedPerson));
+        when(personRepository.findCompleteAll()).thenReturn(List.of(savedPerson));
         when(personMapper.personToPersonDto(savedPerson)).thenReturn(personDto);
 
         // when
@@ -215,7 +232,7 @@ public class PersonServiceTest {
 
     @DisplayName("Test delete non existing person.")
     @Test
-    public void testDeleteNonExistingPerson() {
+    void testDeleteNonExistingPerson() {
         // given
         RecordVoidRequest recordVoidRequest = RecordVoidRequest.builder()
                 .voidReason("Test reason")

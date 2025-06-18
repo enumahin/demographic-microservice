@@ -1,10 +1,10 @@
 package com.alienworkspace.cdr.demographic.model.mapper;
 
 import com.alienworkspace.cdr.demographic.model.Person;
+import com.alienworkspace.cdr.demographic.model.audit.AuditTrailMapper;
 import com.alienworkspace.cdr.model.dto.person.PersonDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
-
 
 /**
  * Maps Person entities to and from PersonDtos.
@@ -33,16 +33,15 @@ public interface PersonMapper {
                 .dead(person.isDead())
                 .deathDate(person.getDeathDate())
                 .causeOfDeath(person.getCauseOfDeath())
+                .name(person.getNames().stream()
+                        .map(PersonNameMapper.INSTANCE::personNameToPersonNameDto)
+                        .toList())
+                .address(person.getAddresses().stream()
+                        .map(PersonAddressMapper.INSTANCE::toDto)
+                        .toList())
+                .attributes(person.getAttributes().stream().map(PersonAttributeMapper.INSTANCE::toDto).toList())
                 .build();
-        personDto.setCreatedAt(person.getCreatedAt());
-        personDto.setCreatedBy(person.getCreatedBy());
-        personDto.setLastModifiedAt(person.getLastModifiedAt());
-        personDto.setLastModifiedBy(person.getLastModifiedBy());
-        personDto.setVoided(person.isVoided());
-        personDto.setVoidedAt(person.getVoidedAt());
-        personDto.setVoidedBy(person.getVoidedBy());
-        personDto.setVoidReason(person.getVoidReason());
-        personDto.setUuid(person.getUuid());
+        AuditTrailMapper.mapToDto(person, personDto);
         return personDto;
     }
 
@@ -66,4 +65,5 @@ public interface PersonMapper {
         }
         return builder.build();
     }
+
 }

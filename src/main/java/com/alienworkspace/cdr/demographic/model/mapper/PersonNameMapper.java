@@ -27,13 +27,15 @@ public interface PersonNameMapper {
     default PersonNameDto personNameToPersonNameDto(PersonName personName) {
         PersonNameDto personNameDto = PersonNameDto.builder()
                 .personNameId(personName.getPersonNameId())
-                .personId(personName.getPersonId())
                 .firstName(personName.getFirstName())
                 .middleName(personName.getMiddleName())
                 .lastName(personName.getLastName())
                 .otherName(personName.getOtherName())
                 .preferred(personName.isPreferred())
                 .build();
+        if (personName.getPerson() != null) {
+            personNameDto.setPersonId(personName.getPerson().getPersonId());
+        }
         personNameDto.setCreatedAt(personName.getCreatedAt());
         personNameDto.setCreatedBy(personName.getCreatedBy());
         personNameDto.setLastModifiedAt(personName.getLastModifiedAt());
@@ -54,7 +56,6 @@ public interface PersonNameMapper {
      */
     default PersonName personNameDtoToPersonName(PersonNameDto personNameDto) {
         PersonName.PersonNameBuilder builder = PersonName.builder()
-                .personId(personNameDto.getPersonId())
                 .firstName(personNameDto.getFirstName())
                 .middleName(personNameDto.getMiddleName())
                 .lastName(personNameDto.getLastName())

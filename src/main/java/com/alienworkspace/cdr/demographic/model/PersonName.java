@@ -2,11 +2,14 @@ package com.alienworkspace.cdr.demographic.model;
 
 import com.alienworkspace.cdr.demographic.model.audit.AuditTrail;
 import com.google.common.base.MoreObjects;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,6 +31,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 @Entity(name = "person_name")
+@SuppressFBWarnings({"EI_EXPOSE_REP", "EI_EXPOSE_REP2"})
 public class PersonName extends AuditTrail {
 
     @Id
@@ -35,8 +39,9 @@ public class PersonName extends AuditTrail {
     @Column(name = "person_name_id")
     private long personNameId;
 
-    @Column(name = "person_id")
-    private long personId;
+    @ManyToOne
+    @JoinColumn(name = "person_id", insertable = false, updatable = false)
+    private Person person;
 
     @Column(name = "first_name")
     private String firstName;
@@ -57,25 +62,25 @@ public class PersonName extends AuditTrail {
         if (!(o instanceof PersonName that)) {
             return false;
         }
-        return personNameId == that.personNameId && personId == that.personId
+        return personNameId == that.personNameId && person == that.person
                 && preferred == that.preferred && Objects.equals(firstName, that.firstName)
                 && Objects.equals(middleName, that.middleName)
                 && Objects.equals(lastName, that.lastName)
                 && Objects.equals(otherName, that.otherName)
-                && Objects.equals(this.getCreatedAt(), that.getCreatedAt())
-                && Objects.equals(this.getCreatedBy(), that.getCreatedBy())
-                && Objects.equals(this.getLastModifiedBy(), that.getLastModifiedBy())
-                && Objects.equals(this.getLastModifiedAt(), that.getLastModifiedAt())
-                && this.isVoided() == that.isVoided()
-                && Objects.equals(this.getVoidedAt(), that.getVoidedAt())
-                && Objects.equals(this.getVoidReason(), that.getVoidReason())
-                && Objects.equals(this.getVoidedBy(), that.getVoidedBy())
-                && Objects.equals(this.getUuid(), that.getUuid());
+                && Objects.equals(getCreatedAt(), that.getCreatedAt())
+                && Objects.equals(getCreatedBy(), that.getCreatedBy())
+                && Objects.equals(getLastModifiedBy(), that.getLastModifiedBy())
+                && Objects.equals(getLastModifiedAt(), that.getLastModifiedAt())
+                && isVoided() == that.isVoided()
+                && Objects.equals(getVoidedAt(), that.getVoidedAt())
+                && Objects.equals(getVoidReason(), that.getVoidReason())
+                && Objects.equals(getVoidedBy(), that.getVoidedBy())
+                && Objects.equals(getUuid(), that.getUuid());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(personNameId, personId, firstName, middleName,
+        return Objects.hash(personNameId, person, firstName, middleName,
                 lastName, otherName, preferred, getCreatedAt(), getCreatedBy(), getLastModifiedBy(),
                 getLastModifiedAt(), isVoided(), getVoidedAt(), getVoidReason(), getVoidedBy(), getUuid());
     }
@@ -83,7 +88,7 @@ public class PersonName extends AuditTrail {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("PersonId", personId)
+                .add("Person", person)
                 .add("PersonNameId", personNameId)
                 .add("FirstName", firstName)
                 .add("MiddleName", middleName)

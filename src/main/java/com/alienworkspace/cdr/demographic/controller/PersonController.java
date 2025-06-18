@@ -3,7 +3,10 @@ package com.alienworkspace.cdr.demographic.controller;
 import com.alienworkspace.cdr.demographic.helpers.Constants;
 import com.alienworkspace.cdr.demographic.service.PersonService;
 import com.alienworkspace.cdr.demographic.service.impl.PersonServiceImpl;
+import com.alienworkspace.cdr.model.dto.person.PersonAddressDto;
+import com.alienworkspace.cdr.model.dto.person.PersonAttributeDto;
 import com.alienworkspace.cdr.model.dto.person.PersonDto;
+import com.alienworkspace.cdr.model.dto.person.PersonNameDto;
 import com.alienworkspace.cdr.model.helper.ErrorResponseDto;
 import com.alienworkspace.cdr.model.helper.RecordVoidRequest;
 import com.alienworkspace.cdr.model.helper.ResponseDto;
@@ -12,7 +15,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -74,23 +76,20 @@ public class PersonController {
             summary = "Get Persons REST API Endpoint",
             description = "Endpoint to fetch all persons record."
     )
-    @ApiResponses(
-            {
-                @ApiResponse(
-                    responseCode = "200",
-                    description = "Http Status OK",
-                    content = @Content(
-                            schema = @Schema(implementation = ResponseDto.class)
-                    )
-                ),
-                @ApiResponse(
-                    responseCode = "500",
-                    description = "Http Status INTERNAL_SERVER_ERROR",
-                    content = @Content(
-                            schema = @Schema(implementation = ErrorResponseDto.class)
-                    )
-                )
-            }
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "Http Status OK",
+            content = @Content(
+                    schema = @Schema(implementation = ResponseDto.class)
+            )
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Http Status INTERNAL_SERVER_ERROR",
+            content = @Content(
+                    schema = @Schema(implementation = ErrorResponseDto.class)
+            )
     )
     @GetMapping
     public ResponseEntity<List<PersonDto>> getPersons() {
@@ -107,23 +106,20 @@ public class PersonController {
             summary = "Get Person REST API Endpoint",
             description = "Endpoint to fetch a person's record."
     )
-    @ApiResponses(
-            {
-                @ApiResponse(
-                    responseCode = "200",
-                    description = "Http Status OK",
-                    content = @Content(
-                            schema = @Schema(implementation = ResponseDto.class)
-                    )
-                ),
-                @ApiResponse(
-                    responseCode = "500",
-                    description = "Http Status INTERNAL_SERVER_ERROR",
-                    content = @Content(
-                            schema = @Schema(implementation = ErrorResponseDto.class)
-                    )
-                )
-            }
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "Http Status OK",
+            content = @Content(
+                    schema = @Schema(implementation = ResponseDto.class)
+            )
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Http Status INTERNAL_SERVER_ERROR",
+            content = @Content(
+                    schema = @Schema(implementation = ErrorResponseDto.class)
+            )
     )
     @GetMapping("{id}")
     public ResponseEntity<PersonDto> getPerson(@PathVariable("id") Long id) {
@@ -141,23 +137,20 @@ public class PersonController {
             summary = "Create Person REST API Endpoint",
             description = "Endpoint to create new person record."
     )
-    @ApiResponses(
-            {
-                @ApiResponse(
-                    responseCode = "200",
-                    description = "Http Status OK",
-                    content = @Content(
-                            schema = @Schema(implementation = ResponseDto.class)
-                    )
-                ),
-                @ApiResponse(
-                    responseCode = "500",
-                    description = "Http Status INTERNAL_SERVER_ERROR",
-                    content = @Content(
-                            schema = @Schema(implementation = ErrorResponseDto.class)
-                    )
-                )
-            }
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "Http Status OK",
+            content = @Content(
+                    schema = @Schema(implementation = ResponseDto.class)
+            )
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Http Status INTERNAL_SERVER_ERROR",
+            content = @Content(
+                    schema = @Schema(implementation = ErrorResponseDto.class)
+            )
     )
     @PostMapping
     public PersonDto addPerson(@Valid @RequestBody PersonDto personDto) {
@@ -174,30 +167,27 @@ public class PersonController {
             summary = "Update Person REST API Endpoint",
             description = "Endpoint to update a person's record."
     )
-    @ApiResponses(
-            {
-                @ApiResponse(
-                        responseCode = "200",
-                        description = "Http Status OK",
-                        content = @Content(
-                                schema = @Schema(implementation = ResponseDto.class)
-                        )
-                ),
-                @ApiResponse(
-                        responseCode = "404",
-                        description = "Http Status NotFound",
-                        content = @Content(
-                                schema = @Schema(implementation = ErrorResponseDto.class)
-                        )
-                ),
-                @ApiResponse(
-                    responseCode = "500",
-                    description = "Http Status INTERNAL_SERVER_ERROR",
-                    content = @Content(
-                            schema = @Schema(implementation = ErrorResponseDto.class)
-                    )
-                )
-            }
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "Http Status OK",
+            content = @Content(
+                    schema = @Schema(implementation = ResponseDto.class)
+            )
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = "Http Status NotFound",
+            content = @Content(
+                    schema = @Schema(implementation = ErrorResponseDto.class)
+            )
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Http Status INTERNAL_SERVER_ERROR",
+            content = @Content(
+                    schema = @Schema(implementation = ErrorResponseDto.class)
+            )
     )
     @PutMapping("/{id}")
     public ResponseEntity<PersonDto> updatePerson(@PathVariable("id") Long id, @RequestBody PersonDto personDto) {
@@ -214,34 +204,321 @@ public class PersonController {
             summary = "Delete Person REST API Endpoint",
             description = "Endpoint to delete a person."
     )
-    @ApiResponses(
-            {
-                @ApiResponse(
-                        responseCode = "200",
-                        description = "Http Status OK",
-                        content = @Content(
-                                schema = @Schema(implementation = ResponseDto.class)
-                        )
-                ),
-                @ApiResponse(
-                        responseCode = "404",
-                        description = "Http Status NotFound",
-                        content = @Content(
-                                schema = @Schema(implementation = ErrorResponseDto.class)
-                        )
-                ),
-                @ApiResponse(
-                        responseCode = "500",
-                        description = "Http Status INTERNAL_SERVER_ERROR",
-                        content = @Content(
-                                schema = @Schema(implementation = ErrorResponseDto.class)
-                        )
-                )
-            }
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "Http Status OK",
+            content = @Content(
+                    schema = @Schema(implementation = ResponseDto.class)
+            )
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = "Http Status NotFound",
+            content = @Content(
+                    schema = @Schema(implementation = ErrorResponseDto.class)
+            )
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Http Status INTERNAL_SERVER_ERROR",
+            content = @Content(
+                    schema = @Schema(implementation = ErrorResponseDto.class)
+            )
     )
     @DeleteMapping("/{id}")
     public ResponseEntity<ResponseDto> deletePerson(@PathVariable("id") long id,
                                                     @RequestBody RecordVoidRequest voidRequest) {
         return ResponseEntity.ok(personService.deletePerson(id, voidRequest));
+    }
+
+    /**
+     * Adds a new person name.
+     *
+     * @param personId the ID of the person to add the name to
+     * @param personNameDto the data transfer object containing the details of the person name to add
+     * @return the added person name as a PersonNameDto
+     */
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(
+            summary = "Create Person Name REST API Endpoint",
+            description = "Endpoint to create new person name record.")
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "Http Status OK",
+            content = @Content(
+                    schema = @Schema(implementation = ResponseDto.class)
+            )
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Http Status INTERNAL_SERVER_ERROR",
+            content = @Content(
+                    schema = @Schema(implementation = ErrorResponseDto.class)
+            )
+    )
+    @PostMapping("/{personId}/names")
+    public ResponseEntity<PersonDto> addPersonName(@PathVariable("personId") long personId,
+                                                       @RequestBody PersonNameDto personNameDto) {
+        return ResponseEntity.ok(personService.addPersonName(personId, personNameDto));
+    }
+
+    /**
+     * Updates an existing person name.
+     *
+     * @param personId the ID of the person to update the name for
+     * @param personNameId the ID of the person name to update
+     * @param personNameDto the data transfer object containing the updated details of the person name
+     * @return the updated person name as a PersonNameDto
+     */
+    @Operation(
+            summary = "Update Person Name REST API Endpoint",
+            description = "Endpoint to update a person name record.")
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "Http Status OK",
+            content = @Content(
+                    schema = @Schema(implementation = ResponseDto.class)
+            )
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Http Status INTERNAL_SERVER_ERROR",
+            content = @Content(
+                    schema = @Schema(implementation = ErrorResponseDto.class)
+            )
+    )
+    @PutMapping("/{personId}/names/{personNameId}")
+    public ResponseEntity<PersonDto> updatePersonName(@PathVariable("personId") long personId,
+                                                       @PathVariable("personNameId") long personNameId,
+                                                       @RequestBody PersonNameDto personNameDto) {
+        return ResponseEntity.ok(personService.updatePersonName(personId, personNameId, personNameDto));
+    }
+
+    /**
+     * Deletes a person name by its ID.
+     *
+     * @param personId the ID of the person to delete the name from
+     * @param personNameId the ID of the person name to delete
+     * @param voidRequest the request containing the ID of the person name to delete
+     */
+    @Operation(
+            summary = "Delete Person Name REST API Endpoint",
+            description = "Endpoint to delete a person name record.")
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "Http Status OK",
+            content = @Content(
+                    schema = @Schema(implementation = ResponseDto.class)
+            )
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Http Status INTERNAL_SERVER_ERROR",
+            content = @Content(
+                    schema = @Schema(implementation = ErrorResponseDto.class)
+            )
+    )
+    @DeleteMapping("/{personId}/names/{personNameId}")
+    public void deletePersonName(@PathVariable("personId") long personId,
+                                                      @PathVariable("personNameId") long personNameId,
+                                                      @RequestBody RecordVoidRequest voidRequest) {
+        personService.deletePersonName(personId, personNameId, voidRequest);
+    }
+
+    /**
+     * Adds a new person address.
+     *
+     * @param personId the ID of the person to add the address to
+     * @param personAddressDto the data transfer object containing the details of the person address to add
+     * @return the added person address as a PersonAddressDto
+     */
+    @Operation(
+            summary = "Create Person Address REST API Endpoint",
+            description = "Endpoint to create new person address record.")
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "Http Status OK",
+            content = @Content(
+                    schema = @Schema(implementation = ResponseDto.class)
+            )
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Http Status INTERNAL_SERVER_ERROR",
+            content = @Content(
+                    schema = @Schema(implementation = ErrorResponseDto.class)
+            )
+    )
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/{personId}/addresses")
+    public ResponseEntity<PersonDto> addPersonAddress(@PathVariable("personId") long personId,
+                                                       @RequestBody PersonAddressDto personAddressDto) {
+        return ResponseEntity.ok(personService.addAddress(personId, personAddressDto));
+    }
+
+    /**
+     * Updates an existing person address.
+     *
+     * @param personId the ID of the person to update the address for
+     * @param personAddressId the ID of the person address to update
+     * @param personAddressDto the data transfer object containing the updated details of the person address
+     * @return the updated person address as a PersonAddressDto
+     */
+    @Operation(
+            summary = "Update Person Address REST API Endpoint",
+            description = "Endpoint to update a person address record.")
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "Http Status OK",
+            content = @Content(
+                    schema = @Schema(implementation = ResponseDto.class)
+            )
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Http Status INTERNAL_SERVER_ERROR",
+            content = @Content(
+                    schema = @Schema(implementation = ErrorResponseDto.class)
+            )
+    )
+    @PutMapping("/{personId}/addresses/{personAddressId}")
+    public ResponseEntity<PersonDto> updatePersonAddress(@PathVariable("personId") long personId,
+                                                       @PathVariable("personAddressId") long personAddressId,
+                                                       @RequestBody PersonAddressDto personAddressDto) {
+        return ResponseEntity.ok(personService.updateAddress(personId, personAddressId, personAddressDto));
+    }
+
+    /**
+     * Deletes a person address by its ID.
+     *
+     * @param personId the ID of the person to delete the address from
+     * @param personAddressId the ID of the person address to delete
+     * @param voidRequest the request containing the ID of the person address to delete
+     */
+    @Operation(
+            summary = "Delete Person Address REST API Endpoint",
+            description = "Endpoint to delete a person address record.")
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "Http Status OK",
+            content = @Content(
+                    schema = @Schema(implementation = ResponseDto.class)
+            )
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Http Status INTERNAL_SERVER_ERROR",
+            content = @Content(
+                    schema = @Schema(implementation = ErrorResponseDto.class)
+            )
+    )
+    @DeleteMapping("/{personId}/addresses/{personAddressId}")
+    public void deletePersonAddress(@PathVariable("personId") long personId,
+                                                      @PathVariable("personAddressId") long personAddressId,
+                                                      @RequestBody RecordVoidRequest voidRequest) {
+        personService.deleteAddress(personId, personAddressId, voidRequest);
+    }
+
+    /**
+     * Adds a new person attribute.
+     *
+     * @param personId the ID of the person to add the attribute to
+     * @param personAttributeDto the data transfer object containing the details of the person attribute to add
+     * @return the added person attribute as a PersonAttributeDto
+     */
+    @Operation(
+            summary = "Create Person Attribute REST API Endpoint",
+            description = "Endpoint to create new person attribute record.")
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "Http Status OK",
+            content = @Content(
+                    schema = @Schema(implementation = ResponseDto.class)
+            )
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Http Status INTERNAL_SERVER_ERROR",
+            content = @Content(
+                    schema = @Schema(implementation = ErrorResponseDto.class)
+            )
+    )
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/{personId}/attributes")
+    public ResponseEntity<PersonDto> addPersonAttribute(@PathVariable("personId") long personId,
+                                                       @RequestBody PersonAttributeDto personAttributeDto) {
+        return ResponseEntity.ok(personService.addAttribute(personId, personAttributeDto));
+    }
+
+    /**
+     * Updates an existing person attribute.
+     *
+     * @param personId the ID of the person to update the attribute for
+     * @param personAttributeId the ID of the person attribute to update
+     * @param personAttributeDto the data transfer object containing the updated details of the person attribute
+     * @return the updated person attribute as a PersonAttributeDto
+     */
+    @Operation(
+            summary = "Update Person Attribute REST API Endpoint",
+            description = "Endpoint to update a person attribute record.")
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "Http Status OK",
+            content = @Content(
+                    schema = @Schema(implementation = ResponseDto.class)
+            )
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Http Status INTERNAL_SERVER_ERROR",
+            content = @Content(
+                    schema = @Schema(implementation = ErrorResponseDto.class)
+            )
+    )
+    @PutMapping("/{personId}/attributes/{personAttributeId}")
+    public ResponseEntity<PersonDto> updatePersonAttribute(@PathVariable("personId") long personId,
+                                                       @PathVariable("personAttributeId") long personAttributeId,
+                                                       @RequestBody PersonAttributeDto personAttributeDto) {
+        return ResponseEntity.ok(personService.updateAttribute(personId, personAttributeId, personAttributeDto));
+    }
+
+    /**
+     * Deletes a person attribute by its ID.
+     *
+     * @param personId the ID of the person to delete the attribute from
+     * @param personAttributeId the ID of the person attribute to delete
+     * @param voidRequest the request containing the ID of the person attribute to delete
+     */
+    @Operation(
+            summary = "Delete Person Attribute REST API Endpoint",
+            description = "Endpoint to delete a person attribute record.")
+    @ApiResponse(
+            responseCode = "200",
+            description = "Http Status OK",
+            content = @Content(
+                    schema = @Schema(implementation = ResponseDto.class)
+            )
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Http Status INTERNAL_SERVER_ERROR",
+            content = @Content(
+                    schema = @Schema(implementation = ErrorResponseDto.class)
+            )
+    )
+    @DeleteMapping("/{personId}/attributes/{personAttributeId}")
+    public void deletePersonAttribute(@PathVariable("personId") long personId,
+                                                      @PathVariable("personAttributeId") long personAttributeId,
+                                                      @RequestBody RecordVoidRequest voidRequest) {
+        personService.deleteAttribute(personId, personAttributeId, voidRequest);
     }
 }

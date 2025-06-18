@@ -73,10 +73,10 @@ public class PersonRepositoryIntegrationTest extends AbstractionContainerBaseTes
         Person updated = personRepository.save(saved);
 
         // then
-        assertTrue(updated.getPersonId() == saved.getPersonId());
-        assertTrue(updated.getGender() == 'F');
+        assertEquals(updated.getPersonId(), saved.getPersonId());
+        assertEquals('F', (char) updated.getGender());
         assertTrue(updated.getLastModifiedAt().isAfter(saved.getCreatedAt()));
-        assertTrue(updated.getLastModifiedBy() == 1L);
+        assertEquals(1L, (long) updated.getLastModifiedBy());
     }
 
     @Test

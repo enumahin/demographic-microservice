@@ -1,11 +1,14 @@
 package com.alienworkspace.cdr.demographic.model;
 
 import com.alienworkspace.cdr.demographic.model.audit.AuditTrail;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,6 +30,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressFBWarnings({"EI_EXPOSE_REP", "EI_EXPOSE_REP2"})
 public class PersonAddress extends AuditTrail {
 
     @Id
@@ -34,8 +38,9 @@ public class PersonAddress extends AuditTrail {
     @Column(name = "person_address_id")
     private long personAddressId;
 
-    @Column(name = "person_id")
-    private long personId;
+    @ManyToOne
+    @JoinColumn(name = "person_id")
+    private Person person;
 
     private boolean preferred;
 
@@ -45,8 +50,14 @@ public class PersonAddress extends AuditTrail {
     @Column(name = "state_id")
     private int state;
 
+    @Column(name = "county_id")
+    private int county;
+
     @Column(name = "city_id")
     private int city;
+
+    @Column(name = "community_id")
+    private int community;
 
     @Column(name = "postal_code")
     private String postalCode;

@@ -1,12 +1,17 @@
 package com.alienworkspace.cdr.demographic.model;
 
 import com.alienworkspace.cdr.demographic.model.audit.AuditTrail;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,9 +24,11 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "person_attribute")
+@SuppressFBWarnings({"EI_EXPOSE_REP", "EI_EXPOSE_REP2"})
 public class PersonAttribute extends AuditTrail {
 
     @Id
@@ -29,12 +36,16 @@ public class PersonAttribute extends AuditTrail {
     @Column(name = "person_attribute_id")
     private long personAttributeId;
 
-    @Column(name = "person_id")
-    private long personId;
+    @ManyToOne
+    @JoinColumn(name = "person_id")
+    private Person person;
 
-    @Column(name = "person_attribute_type_id")
-    private int personAttributeTypeId;
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "person_attribute_type_id")
+    private PersonAttributeType personAttributeType;
 
     @Column(name = "attribute_value")
     private String attributeValue;
+
+    private boolean preferred;
 }
