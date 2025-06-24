@@ -5,6 +5,7 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import jakarta.persistence.PrePersist;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -67,7 +68,13 @@ public class AuditTrail {
     @Column(name = "void_reason")
     private String voidReason;
 
+    @Column(name = "uuid", updatable = false, nullable = false, unique = true)
     private String uuid = UUID.randomUUID().toString();
 
-
+    @PrePersist
+    public void generateUuid() {
+        if (uuid == null) {
+            this.uuid = UUID.randomUUID().toString();
+        }
+    }
 }
