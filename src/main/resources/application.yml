@@ -1,6 +1,11 @@
 spring:
   application:
     name: demographic
+  config:
+    import: "optional:configserver:http://localhost:8071/"
+  profiles:
+    active:
+      - "prod"
 
   datasource:
     url: jdbc:mysql://localhost:3306/demographics?createDatabaseIfNotExist=true
@@ -13,5 +18,15 @@ spring:
       ddl-auto: update
     database-platform: org.hibernate.dialect.MySQL8Dialect
 
+
 server:
   port: 8020
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
