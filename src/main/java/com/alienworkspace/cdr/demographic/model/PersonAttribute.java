@@ -2,14 +2,15 @@ package com.alienworkspace.cdr.demographic.model;
 
 import com.alienworkspace.cdr.demographic.model.audit.AuditTrail;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -36,12 +37,14 @@ public class PersonAttribute extends AuditTrail {
     @Column(name = "person_attribute_id")
     private long personAttributeId;
 
-    @ManyToOne
-    @JoinColumn(name = "person_id")
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "person_id", nullable = false)
     private Person person;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "person_attribute_type_id")
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "person_attribute_type_id", nullable = false)
     private PersonAttributeType personAttributeType;
 
     @Column(name = "attribute_value")

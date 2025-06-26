@@ -71,6 +71,27 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     /**
+     * Handles {@link BadRequestException} exceptions. This exception is thrown when a
+     * customer already exists in the database.
+     *
+     * @param exception the exception thrown
+     * @param webRequest the web request
+     * @return an {@link ErrorResponseDto} containing the error code, error message,
+     *     path of the API, and the timestamp of the error
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponseDto> handleBadRequestException(IllegalArgumentException exception,
+                                                                            WebRequest webRequest) {
+        ErrorResponseDto errorResponseDto = ErrorResponseDto.builder()
+                .errorCode(HttpStatus.BAD_REQUEST.value())
+                .apiPath(webRequest.getDescription(false))
+                .errorMessage(exception.getMessage())
+                .errorTime(LocalDateTime.now())
+                .build();
+        return new ResponseEntity<>(errorResponseDto, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
      * Handles global exceptions that occur in the application.
      *
      * <p>This method handles any exception that is not specifically handled by another

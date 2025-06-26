@@ -7,6 +7,7 @@ import com.alienworkspace.cdr.model.dto.person.PersonNameDto;
 import com.alienworkspace.cdr.model.helper.RecordVoidRequest;
 import com.alienworkspace.cdr.model.helper.ResponseDto;
 import java.util.List;
+import java.util.Set;
 
 /**
  * This interface defines the methods for managing person records in the system.
@@ -26,9 +27,10 @@ public interface PersonService {
      * Retrieves a person by their ID.
      *
      * @param personId the ID of the person to be retrieved
+     * @param includeVoided a flag indicating whether to include voided records
      * @return a PersonDto object containing the data of the person with the given ID
      */
-    PersonDto getPerson(Long personId);
+    PersonDto getPerson(Long personId, boolean includeVoided);
 
     /**
      * Adds a new person to the system.
@@ -63,7 +65,7 @@ public interface PersonService {
      * @param personNameDto the PersonNameDto object containing the data of the person name to be added
      * @return a PersonNameDto object containing the data of the newly added person name
      */
-    PersonDto addPersonName(long personId, PersonNameDto personNameDto);
+    PersonNameDto addPersonName(long personId, PersonNameDto personNameDto);
 
     /**
      * Deletes a person name by its ID.
@@ -81,7 +83,7 @@ public interface PersonService {
      * @param personAddressDto the PersonAddressDto object containing the data of the person address to be added
      * @return a PersonAddressDto object containing the data of the newly added person address
      */
-    PersonDto addAddress(Long personId, PersonAddressDto personAddressDto);
+    PersonAddressDto addAddress(Long personId, PersonAddressDto personAddressDto);
 
     /**
      * Adds a new person attribute to the system.
@@ -90,37 +92,37 @@ public interface PersonService {
      * @param personAttributeDto the PersonAttributeDto object containing the data of the person attribute to be added
      * @return a PersonAttributeDto object containing the data of the newly added person attribute
      */
-    PersonDto addAttribute(Long personId, PersonAttributeDto personAttributeDto);
+    PersonAttributeDto addAttribute(Long personId, PersonAttributeDto personAttributeDto);
 
     /**
      * Updates an existing person name in the system.
      *
      * @param personId the ID of the person the name belongs to
      * @param personNameId the ID of the person name to be updated
-     * @param personNameDto the PersonNameDto object containing the updated data of the person name
+     * @param preferred the preferred name
      * @return a PersonNameDto object containing the updated data of the person name
      */
-    PersonDto updatePersonName(long personId, long personNameId, PersonNameDto personNameDto);
+    PersonNameDto updatePersonName(long personId, long personNameId, boolean preferred);
 
     /**
      * Updates an existing person address in the system.
      *
      * @param personId the ID of the person the address belongs to
      * @param personAddressId the ID of the person address to be updated
-     * @param personAddressDto the PersonAddressDto object containing the updated data of the person address
+     * @param preferred the preferred address
      * @return a PersonAddressDto object containing the updated data of the person address
      */
-    PersonDto updateAddress(long personId, long personAddressId, PersonAddressDto personAddressDto);
+    PersonAddressDto updateAddress(long personId, long personAddressId, boolean preferred);
 
     /**
      * Updates an existing person attribute in the system.
      *
      * @param personId the ID of the person the attribute belongs to
      * @param personAttributeId the ID of the person attribute to be updated
-     * @param personAttributeDto the PersonAttributeDto object containing the updated data of the person attribute
+     * @param preferred the preferred attribute
      * @return a PersonAttributeDto object containing the updated data of the person attribute
      */
-    PersonDto updateAttribute(long personId, long personAttributeId, PersonAttributeDto personAttributeDto);
+    PersonAttributeDto updateAttribute(long personId, long personAttributeId, boolean preferred);
 
     /**
      * Deletes a person address by its ID.
@@ -139,4 +141,21 @@ public interface PersonService {
      * @param voidRequest the request containing the ID of the person attribute to delete
      */
     void deleteAttribute(long personId, long personAttributeId, RecordVoidRequest voidRequest);
+
+    /**
+     * Retrieves a person address by its ID.
+     *
+     * @param personId the ID of the person the address belongs to
+     * @param personAddressId the ID of the person address to retrieve
+     * @return a PersonAddressDto object containing the data of the person address
+     */
+    PersonAddressDto getPersonAddress(long personId, long personAddressId);
+
+    /**
+     * Retrieves all person addresses for a person.
+     *
+     * @param personId the ID of the person to retrieve addresses for
+     * @return a Set of PersonAddressDto objects containing the data of all person addresses
+     */
+    Set<PersonAddressDto> getPersonAddresses(long personId);
 }

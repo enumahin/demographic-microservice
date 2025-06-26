@@ -1,9 +1,11 @@
 package com.alienworkspace.cdr.demographic.service;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 import com.alienworkspace.cdr.demographic.integration.AbstractionContainerBaseTest;
 import com.alienworkspace.cdr.demographic.repository.PersonRepository;
+import com.alienworkspace.cdr.demographic.service.client.MetadataFeignClient;
 import com.alienworkspace.cdr.model.dto.metadata.*;
 import com.alienworkspace.cdr.model.dto.person.*;
 import com.alienworkspace.cdr.model.helper.RecordVoidRequest;
@@ -14,8 +16,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
@@ -29,6 +37,9 @@ public class PersonServiceIntegrationTest extends AbstractionContainerBaseTest {
 
     @Autowired
     private PersonService personService;
+
+    @MockitoBean
+    private MetadataFeignClient metadataFeignClient;
 
     private final PersonNameDto.PersonNameDtoBuilder personNameDtoBuilder = PersonNameDto.builder();
     private final PersonAddressDto.PersonAddressDtoBuilder personAddressDtoBuilder = PersonAddressDto.builder();
@@ -67,6 +78,13 @@ public class PersonServiceIntegrationTest extends AbstractionContainerBaseTest {
                 .addressLine2("test address line 2")
                 .addressLine3("test address line 3")
                 .postalCode("test postal code");
+
+        when(metadataFeignClient.getCountry(1)).thenReturn(
+                        ResponseEntity.ok(CountryDto.builder().countryId(1).countryName("test country").build()));
+
+        when(metadataFeignClient.getPersonLocation(1, 1, 1, 1, 1,
+                null)).thenReturn(
+                        ResponseEntity.ok(CountryDto.builder().countryId(1).countryName("test country").build()));
     }
 
     @DisplayName("Test add person")
@@ -103,6 +121,7 @@ public class PersonServiceIntegrationTest extends AbstractionContainerBaseTest {
         PersonDto savedPerson = personService.addPerson(personDto);
         PersonDto update = PersonDto.builder()
                 .personId(savedPerson.getPersonId())
+                .address(new HashSet<>())
                 .gender('M')
                 .birthDate(LocalDate.parse("2000-01-01"))
                 .build();
@@ -128,7 +147,7 @@ public class PersonServiceIntegrationTest extends AbstractionContainerBaseTest {
 
         // when
         PersonDto saved = personService.addPerson(personDto);
-        PersonDto response = personService.getPerson(saved.getPersonId());
+        PersonDto response = personService.getPerson(saved.getPersonId(), false);
 
         // then
         assertEquals(saved.getGender(), response.getGender());
@@ -177,7 +196,7 @@ public class PersonServiceIntegrationTest extends AbstractionContainerBaseTest {
                 .build();
 
         ResponseDto response = personService.deletePerson(savedPerson.getPersonId(), request);
-        PersonDto deletedPerson = personService.getPerson(savedPerson.getPersonId());
+        PersonDto deletedPerson = personService.getPerson(savedPerson.getPersonId(), true);
 
         // then
         assertEquals("Person deleted successfully", response.getStatusMessage());
@@ -196,11 +215,14 @@ public class PersonServiceIntegrationTest extends AbstractionContainerBaseTest {
         PersonDto savedPerson = personService.addPerson(personDto);
 
         // when
-        savedPerson = personService.addPersonName(savedPerson.getPersonId(), personNameDto);
+        PersonNameDto savedPersonName = personService.addPersonName(savedPerson.getPersonId(), personNameDto);
 
         // then
-        assertNotNull(savedPerson);
-        assertEquals(1, savedPerson.getName().size());
+        assertNotNull(savedPersonName);
+        assertEquals(personNameDto.getFirstName(), savedPersonName.getFirstName());
+        assertEquals(personNameDto.getLastName(), savedPersonName.getLastName());
+        assertTrue(savedPersonName.getPreferred());
+        assertEquals(savedPerson.getPersonId(), savedPersonName.getPersonId());
     }
 
     @DisplayName("Test add a second not preferred person name")
@@ -212,19 +234,17 @@ public class PersonServiceIntegrationTest extends AbstractionContainerBaseTest {
         PersonDto savedPerson = personService.addPerson(personDto);
 
         // when
-        savedPerson = personService.addPersonName(savedPerson.getPersonId(), personNameDto);
-        savedPerson = personService.addPersonName(savedPerson.getPersonId(),
+        PersonNameDto savedPersonName = personService.addPersonName(savedPerson.getPersonId(), personNameDto);
+        PersonNameDto savedPersonName2 = personService.addPersonName(savedPerson.getPersonId(),
                 personNameDtoBuilder.firstName("Queen").build());
+        PersonDto updatedPerson = personService.getPerson(savedPerson.getPersonId(), false);
 
         // then
-        assertNotNull(savedPerson);
-        assertTrue(savedPerson.getName().stream()
-                .filter(name -> name.getFirstName().equals("John"))
-                .findFirst().map(PersonNameDto::getPreferred).orElse(false));
-        assertFalse(savedPerson.getName().stream()
-                .filter(name -> name.getFirstName().equals("Queen"))
-                .findFirst().map(PersonNameDto::getPreferred).orElse(true));
-        assertEquals(2, savedPerson.getName().size());
+        assertNotNull(savedPersonName);
+        assertNotNull(savedPersonName2);
+        assertTrue(savedPersonName.getPreferred());
+        assertFalse(savedPersonName2.getPreferred());
+        assertEquals(2, updatedPerson.getName().size());
     }
 
     @DisplayName("Test add a new second preferred person name")
@@ -236,19 +256,24 @@ public class PersonServiceIntegrationTest extends AbstractionContainerBaseTest {
         PersonDto savedPerson = personService.addPerson(personDto);
 
         // when
-        savedPerson = personService.addPersonName(savedPerson.getPersonId(), personNameDto);
-        savedPerson = personService.addPersonName(savedPerson.getPersonId(),
+        PersonNameDto savedPersonName = personService.addPersonName(savedPerson.getPersonId(), personNameDto);
+        PersonNameDto savedPersonName2 = personService.addPersonName(savedPerson.getPersonId(),
                 personNameDtoBuilder.firstName("Queen").preferred(true).build());
+        PersonDto updatedPerson = personService.getPerson(savedPerson.getPersonId(), false);
 
         // then
         assertNotNull(savedPerson);
-        assertFalse(savedPerson.getName().stream()
-                .filter(name -> name.getFirstName().equals("John"))
-                .findFirst().map(PersonNameDto::getPreferred).orElse(true));
-        assertTrue(savedPerson.getName().stream()
-                .filter(name -> name.getFirstName().equals("Queen"))
-                .findFirst().map(PersonNameDto::getPreferred).orElse(false));
-        assertEquals(2, savedPerson.getName().size());
+        assertFalse(updatedPerson.getName().stream().filter(name ->
+                Objects.equals(name.getFirstName(), savedPersonName.getFirstName())
+                && Objects.equals(name.getMiddleName(), savedPersonName.getMiddleName())
+                        && Objects.equals(name.getLastName(), savedPersonName.getLastName())).findFirst()
+                .map(PersonNameDto::getPreferred).orElse(true));
+        assertTrue(updatedPerson.getName().stream().filter(name ->
+                        Objects.equals(name.getFirstName(), savedPersonName2.getFirstName())
+                                && Objects.equals(name.getMiddleName(), savedPersonName2.getMiddleName())
+                                && Objects.equals(name.getLastName(), savedPersonName2.getLastName())).findFirst()
+                .map(PersonNameDto::getPreferred).orElse(false));
+        assertEquals(2, updatedPerson.getName().size());
     }
 
     @DisplayName("Test add a new person name")
@@ -260,11 +285,14 @@ public class PersonServiceIntegrationTest extends AbstractionContainerBaseTest {
         PersonDto savedPerson = personService.addPerson(personDto);
 
         // when
-        savedPerson = personService.addAddress(savedPerson.getPersonId(), personAddressDto);
+        PersonAddressDto savedPersonAddressDto = personService.addAddress(savedPerson.getPersonId(), personAddressDto);
 
+        PersonDto updatedPerson = personService.getPerson(savedPerson.getPersonId(), false);
         // then
         assertNotNull(savedPerson);
-        assertEquals(1, savedPerson.getAddress().size());
+        assertNotNull(savedPersonAddressDto);
+        System.out.println(updatedPerson);
+        assertEquals(1, updatedPerson.getAddress().size());
     }
 
     @DisplayName("Test add a second not preferred person address")
@@ -276,19 +304,25 @@ public class PersonServiceIntegrationTest extends AbstractionContainerBaseTest {
         PersonDto savedPerson = personService.addPerson(personDto);
 
         // when
-        savedPerson = personService.addAddress(savedPerson.getPersonId(), personAddressDto);
-        savedPerson = personService.addAddress(savedPerson.getPersonId(), personAddressDtoBuilder
+        PersonAddressDto savedPersonAddressDto = personService.addAddress(savedPerson.getPersonId(), personAddressDto);
+        PersonAddressDto savedPersonAddressDto2 = personService.addAddress(savedPerson.getPersonId(), personAddressDtoBuilder
                 .addressLine1("Another Address").preferred(false).build());
+        PersonDto updatedPerson = personService.getPerson(savedPerson.getPersonId(), false);
 
         // then
-        assertNotNull(savedPerson);
-        assertTrue(savedPerson.getAddress().stream()
-                .filter(pa -> !pa.getAddressLine1().equals("Another Address"))
-                .findFirst().map(PersonAddressDto::isPreferred).orElse(false));
-        assertFalse(savedPerson.getAddress().stream()
-                .filter(pa -> pa.getAddressLine1().equals("Another Address"))
-                .findFirst().map(PersonAddressDto::isPreferred).orElse(true));
-        assertEquals(2, savedPerson.getAddress().size());
+        System.out.println(updatedPerson);
+        assertNotNull(savedPersonAddressDto);
+        assertNotNull(savedPersonAddressDto2);
+        assertTrue(updatedPerson.getAddress().stream().filter(address ->
+                address.getAddressLine1().equals(savedPersonAddressDto.getAddressLine1())
+                && address.getAddressLine2().equals(savedPersonAddressDto.getAddressLine2())).findFirst()
+                .map(PersonAddressDto::isPreferred).orElse(false));
+        assertFalse(updatedPerson.getAddress().stream().filter(address ->
+                        address.getAddressLine1().equals(savedPersonAddressDto2.getAddressLine1())
+                                && address.getAddressLine2().equals(savedPersonAddressDto2.getAddressLine2())).findFirst()
+                .map(PersonAddressDto::isPreferred).orElse(true));
+
+        assertEquals(2, updatedPerson.getAddress().size());
     }
 
     @DisplayName("Test add a new second preferred person address")
@@ -300,19 +334,23 @@ public class PersonServiceIntegrationTest extends AbstractionContainerBaseTest {
         PersonDto savedPerson = personService.addPerson(personDto);
 
         // when
-        savedPerson = personService.addAddress(savedPerson.getPersonId(), personAddressDto);
-        savedPerson = personService.addAddress(savedPerson.getPersonId(),
+        PersonAddressDto savedPersonAddressDto = personService.addAddress(savedPerson.getPersonId(), personAddressDto);
+        PersonAddressDto savedPersonAddressDto2 = personService.addAddress(savedPerson.getPersonId(),
                 personAddressDtoBuilder.addressLine1("Another Address").preferred(true).build());
+        PersonDto updatedPerson = personService.getPerson(savedPerson.getPersonId(), false);
 
         // then
-        assertNotNull(savedPerson);
-        assertFalse(savedPerson.getAddress().stream()
-                .filter(pa -> !pa.getAddressLine1().equals("Another Address"))
-                .findFirst().map(PersonAddressDto::isPreferred).orElse(true));
-        assertTrue(savedPerson.getAddress().stream()
-                .filter(pa -> pa.getAddressLine1().equals("Another Address"))
-                .findFirst().map(PersonAddressDto::isPreferred).orElse(false));
-        assertEquals(2, savedPerson.getAddress().size());
+        assertNotNull(savedPersonAddressDto);
+        assertNotNull(savedPersonAddressDto2);
+        assertFalse(updatedPerson.getAddress().stream().filter(address ->
+                address.getAddressLine1().equals(savedPersonAddressDto.getAddressLine1())
+                && address.getAddressLine2().equals(savedPersonAddressDto.getAddressLine2())).findFirst()
+                .map(PersonAddressDto::isPreferred).orElse(true));
+        assertTrue(updatedPerson.getAddress().stream().filter(address ->
+                        address.getAddressLine1().equals(savedPersonAddressDto2.getAddressLine1())
+                                && address.getAddressLine2().equals(savedPersonAddressDto2.getAddressLine2())).findFirst()
+                .map(PersonAddressDto::isPreferred).orElse(false));
+        assertEquals(2, updatedPerson.getAddress().size());
     }
 
     @DisplayName("Test add a new person attribute")
@@ -324,10 +362,13 @@ public class PersonServiceIntegrationTest extends AbstractionContainerBaseTest {
         PersonDto savedPerson = personService.addPerson(personDto);
 
         // when
-        savedPerson = personService.addAttribute(savedPerson.getPersonId(), personAttributeDto);
+        PersonAttributeDto savedPersonAttribute = personService.addAttribute(savedPerson.getPersonId(),
+                personAttributeDto);
+        PersonDto updatedPerson = personService.getPerson(savedPerson.getPersonId(), false);
 
         // then
         assertNotNull(savedPerson);
-        assertEquals(1, savedPerson.getAttributes().size());
+        assertNotNull(savedPersonAttribute);
+        assertEquals(1, updatedPerson.getAttributes().size());
     }
 }

@@ -16,4 +16,8 @@ public class Constants {
 
     public static final String PERSON_ATTRIBUTE_TYPE_BASE_URL = BASE_URL + "/person-attribute-types";
 
+
+    public static final String METADATA_BASE_URL = "/api/metadata";
+
+    private Constants() {}
 }

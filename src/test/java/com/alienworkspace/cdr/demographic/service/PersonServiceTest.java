@@ -8,6 +8,7 @@ import com.alienworkspace.cdr.demographic.model.mapper.PersonMapper;
 import com.alienworkspace.cdr.demographic.model.mapper.PersonNameMapper;
 import com.alienworkspace.cdr.demographic.repository.PersonAttributeTypeRepository;
 import com.alienworkspace.cdr.demographic.repository.PersonRepository;
+import com.alienworkspace.cdr.demographic.service.client.MetadataFeignClient;
 import com.alienworkspace.cdr.demographic.service.impl.PersonServiceImpl;
 import com.alienworkspace.cdr.model.dto.person.PersonDto;
 import com.alienworkspace.cdr.model.helper.RecordVoidRequest;
@@ -15,14 +16,16 @@ import com.alienworkspace.cdr.model.helper.ResponseDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.hibernate.validator.internal.util.Contracts.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -30,15 +33,7 @@ public class PersonServiceTest {
 
     private PersonRepository personRepository;
 
-    private PersonAttributeTypeRepository  personAttributeTypeRepository;
-
     private PersonMapper personMapper;
-
-    private PersonNameMapper personNameMapper;
-
-    private PersonAddressMapper personAddressMapper;
-
-    private PersonAttributeMapper personAttributeMapper;
 
     private PersonServiceImpl personService;
 
@@ -53,13 +48,14 @@ public class PersonServiceTest {
     @BeforeEach
     public void setup() {
         personRepository = mock(PersonRepository.class);
-        personAttributeTypeRepository = mock(PersonAttributeTypeRepository.class);
+        PersonAttributeTypeRepository personAttributeTypeRepository = mock(PersonAttributeTypeRepository.class);
         personMapper = mock(PersonMapper.class);
-        personNameMapper = mock(PersonNameMapper.class);
-        personAddressMapper = mock(PersonAddressMapper.class);
-        personAttributeMapper = mock(PersonAttributeMapper.class);
+        PersonNameMapper personNameMapper = mock(PersonNameMapper.class);
+        PersonAddressMapper personAddressMapper = mock(PersonAddressMapper.class);
+        PersonAttributeMapper personAttributeMapper = mock(PersonAttributeMapper.class);
+        MetadataFeignClient metadataFeignClient = mock(MetadataFeignClient.class);
         personService = new PersonServiceImpl(personRepository, personAttributeTypeRepository, personMapper,
-                personNameMapper, personAddressMapper, personAttributeMapper);
+                personNameMapper, personAddressMapper, personAttributeMapper, metadataFeignClient);
 
         personDtoBuilder = PersonDto.builder()
                 .gender('M')
@@ -122,7 +118,7 @@ public class PersonServiceTest {
         when(personMapper.personToPersonDto(savedPerson)).thenReturn(personDto);
 
         // when
-        PersonDto response = personService.getPerson(1L);
+        PersonDto response = personService.getPerson(1L, false);
 
         // then
         assertEquals(personDto.getPersonId(), response.getPersonId());
@@ -137,10 +133,9 @@ public class PersonServiceTest {
     @Test
     public void testGetNonExistingPerson() {
         // given
-        when(personRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         // when
-        assertThrows(ResourceNotFoundException.class, () -> personService.getPerson(1L));
+        assertThrows(ResourceNotFoundException.class, () -> personService.getPerson(1L, false));
 
         // then - throw exception
     }
@@ -173,7 +168,7 @@ public class PersonServiceTest {
                 .personId(1L)
                 .gender('F')
                 .build();
-        when(personRepository.findByPersonId(any(Long.class))).thenReturn(Optional.of(savedPerson));
+        when(personRepository.findCompleteById(any(Long.class))).thenReturn(Optional.of(savedPerson));
         when(personRepository.save(any(Person.class))).thenReturn(updatedPerson);
         when(personMapper.personToPersonDto(any(Person.class))).thenReturn(updatedPersonDto);
 
@@ -194,7 +189,6 @@ public class PersonServiceTest {
     @Test
     public void testUpdateNonExistingPerson() {
         // given
-        when(personRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         // when
         assertThrows(ResourceNotFoundException.class, () -> personService.updatePerson(1L, personDtoBuilder.personId(1L)
@@ -219,14 +213,28 @@ public class PersonServiceTest {
         updatedPerson.setVoidReason("test");
         updatedPerson.setVoidedAt(LocalDateTime.now());
         updatedPerson.setVoidedBy(1L);
+        updatedPerson.setUuid(UUID.randomUUID().toString());
 
         when(personRepository.findById(any(Long.class))).thenReturn(Optional.of(savedPerson));
-        when(personRepository.save(updatedPerson)).thenReturn(updatedPerson);
+        when(personRepository.save(any(Person.class))).thenReturn(updatedPerson);
+        
+        // Create ArgumentCaptor to capture the Person object passed to save()
+        ArgumentCaptor<Person> personCaptor = ArgumentCaptor.forClass(Person.class);
 
         // when
         ResponseDto response = personService.deletePerson(1, recordVoidRequest);
 
         // then
+        verify(personRepository).findById(1L);
+        verify(personRepository).save(personCaptor.capture());
+        
+        // Verify the captured Person object
+        Person capturedPerson = personCaptor.getValue();
+        assertTrue(capturedPerson.isVoided(), "Person should be marked as voided");
+        assertEquals("Test reason", capturedPerson.getVoidReason(), "Void reason should match");
+        assertNotNull(capturedPerson.getVoidedAt(), "Voided timestamp should be set");
+        assertEquals(1L, capturedPerson.getVoidedBy(), "Voided by should be set to 1");
+        
         assertEquals("Person deleted successfully", response.getStatusMessage());
     }
 

@@ -27,6 +27,32 @@ management:
     web:
       exposure:
         include: "*"
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
   endpoint:
     health:
       show-details: always
+      probes:
+        enabled: true
+    shutdown:
+      access: unrestricted # Allow gracefully shutdown of the microservice
+  info:
+    env:
+      enabled: true # Enable display of the microservice info in the actuator endpoints
+eureka:
+  instance:
+    preferIpAddress: true # prefer the IP address the client registered with
+  client:
+    fetchRegistry: true # fetch registry details of other microservices
+    registerWithEureka: true # Tells Eureka to register with Itself
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+
+info:
+  app:
+    name: "demographic"
+    description: "Demographic Microservice"
+    version: "1.0.0"
