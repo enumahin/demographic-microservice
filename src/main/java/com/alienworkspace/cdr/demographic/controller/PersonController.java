@@ -19,6 +19,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,9 +29,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
 
 /**
  * Controller for managing person-related operations in the demographic module.
@@ -56,6 +60,8 @@ import org.springframework.web.bind.annotation.RestController;
         description = "CRUD operations related to Person entities"
 )
 public class PersonController {
+
+    private static final Logger log = LoggerFactory.getLogger(PersonController.class);
 
     private final PersonService personService;
 
@@ -123,8 +129,10 @@ public class PersonController {
             )
     )
     @GetMapping("{id}/{includeVoided}")
-    public ResponseEntity<PersonDto> getPerson(@PathVariable("id") long id, @PathVariable boolean includeVoided) {
-        return ResponseEntity.ok(personService.getPerson(id, includeVoided));
+    public ResponseEntity<PersonDto> getPerson(@RequestHeader("X-cdr-correlation-id") String correlationId,
+                                               @PathVariable("id") long id, @PathVariable boolean includeVoided) {
+        log.debug("Retrieving person with ID: {} with correlationId: {}", id, correlationId);
+        return ResponseEntity.ok(personService.getPerson(correlationId, id, includeVoided));
     }
 
     /**
@@ -154,8 +162,10 @@ public class PersonController {
             )
     )
     @PostMapping
-    public PersonDto addPerson(@Valid @RequestBody PersonDto personDto) {
-        return personService.addPerson(personDto);
+    public PersonDto addPerson(@RequestHeader("X-cdr-correlation-id") String correlationId,
+                               @Valid @RequestBody PersonDto personDto) {
+        log.debug("Adding person with correlationId: {}", correlationId);
+        return personService.addPerson(personDto, correlationId);
     }
 
     /**
@@ -191,9 +201,11 @@ public class PersonController {
             )
     )
     @PutMapping("/{id}")
-    public ResponseEntity<PersonDto> updatePerson(@PathVariable("id") Long id,
+    public ResponseEntity<PersonDto> updatePerson(@RequestHeader("X-cdr-correlation-id") String correlationId,
+                                                  @PathVariable("id") Long id,
                                                   @Valid @RequestBody PersonDto personDto) {
-        return ResponseEntity.ok(personService.updatePerson(id, personDto));
+        log.debug("Updating person with ID: {} with correlationId: {}", id, correlationId);
+        return ResponseEntity.ok(personService.updatePerson(id, personDto, correlationId));
     }
 
     /**
@@ -358,9 +370,12 @@ public class PersonController {
     )
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/{personId}/addresses")
-    public ResponseEntity<PersonAddressDto> addPersonAddress(@PathVariable("personId") long personId,
-                                                      @Valid @RequestBody PersonAddressDto personAddressDto) {
-        return ResponseEntity.ok(personService.addAddress(personId, personAddressDto));
+    public ResponseEntity<PersonAddressDto> addPersonAddress(
+            @RequestHeader("X-cdr-correlation-id") String correlationId,
+            @PathVariable("personId") long personId,
+            @Valid @RequestBody PersonAddressDto personAddressDto) {
+        log.info("Correlation ID: {}", correlationId);
+        return ResponseEntity.ok(personService.addAddress(personId, personAddressDto, correlationId));
     }
 
     /**
@@ -390,10 +405,13 @@ public class PersonController {
             )
     )
     @PutMapping("/{personId}/addresses/{personAddressId}")
-    public ResponseEntity<PersonAddressDto> updatePersonAddress(@PathVariable("personId") long personId,
+    public ResponseEntity<PersonAddressDto> updatePersonAddress(
+                                                         @RequestHeader("X-cdr-correlation-id") String correlationId,
+                                                         @PathVariable("personId") long personId,
                                                          @PathVariable("personAddressId") long personAddressId,
                                                          @RequestBody boolean preferred) {
-        return ResponseEntity.ok(personService.updateAddress(personId, personAddressId, preferred));
+        log.info("Correlation ID: {}", correlationId);
+        return ResponseEntity.ok(personService.updateAddress(personId, personAddressId, preferred, correlationId));
     }
 
     /**

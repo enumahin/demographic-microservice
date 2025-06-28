@@ -6,7 +6,7 @@ package com.alienworkspace.cdr.demographic.helpers;
  */
 public class Constants {
 
-    public static final String BASE_URL = "/api/demographic";
+    public static final String BASE_URL = "/api";
 
     public static final String CONFIG_BASE_URL = BASE_URL + "/configs";
     /**
@@ -17,7 +17,7 @@ public class Constants {
     public static final String PERSON_ATTRIBUTE_TYPE_BASE_URL = BASE_URL + "/person-attribute-types";
 
 
-    public static final String METADATA_BASE_URL = "/api/metadata";
+    public static final String METADATA_BASE_URL = "/api";
 
     private Constants() {}
 }

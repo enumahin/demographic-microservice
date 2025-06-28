@@ -60,7 +60,7 @@ public class PersonControllerIntegrationTest extends AbstractionContainerBaseTes
                 .gender('M')
                 .birthDate(LocalDate.parse("1990-01-01"));
 
-        when(metadataFeignClient.getCountry(1)).thenReturn(
+        when(metadataFeignClient.getCountry("CORRELATION-ID", 1)).thenReturn(
                 ResponseEntity.ok(CountryDto.builder().countryId(1).countryName("test country").build()));
 
         when(metadataFeignClient.getPersonLocation(1, 1, 1, 1, 1,
