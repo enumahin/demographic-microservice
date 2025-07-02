@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 /**
  * Feign client for interacting with the metadata service.
  */
-@FeignClient("metadata")
+@FeignClient(name = "metadata", fallback = MetadataFallback.class)
 public interface MetadataFeignClient {
 
     /**
