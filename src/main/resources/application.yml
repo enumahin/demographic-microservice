@@ -6,6 +6,10 @@ spring:
   profiles:
     active:
       - "prod"
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
 
   datasource:
     url: jdbc:mysql://localhost:3306/demographics?createDatabaseIfNotExist=true
@@ -63,3 +67,12 @@ logging:
       alienworkspace:
         cdr:
           demographic: DEBUG
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        slidingWindowSize: 10
+        permittedNumberOfCallsInHalfOpenState: 2
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s

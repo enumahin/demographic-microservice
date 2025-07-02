@@ -541,17 +541,16 @@ public class PersonServiceImpl implements PersonService {
     }
 
     private PersonAddressDto fetchAddress(String correlationId, PersonAddress address) {
-        try {
-            if (address == null) {
-                return null;
-            }
-            PersonAddressDto personAddressDto = personAddressMapper.toDto(address);
-            if (address.getCountry() > 0) {
-                CountryDto countryDto = metadataFeignClient.getPersonLocation(correlationId, address.getCountry(),
-                        address.getState(), address.getCounty(), address.getCity(), address.getCommunity()).getBody();
-                if (countryDto == null) {
-                    throw new IllegalStateException("Error getting country");
-                }
+
+        if (address == null) {
+            return null;
+        }
+        PersonAddressDto personAddressDto = personAddressMapper.toDto(address);
+        if (address.getCountry() > 0) {
+            CountryDto countryDto = metadataFeignClient.getPersonLocation(correlationId, address.getCountry(),
+                    address.getState(), address.getCounty(), address.getCity(), address.getCommunity()).getBody();
+            if (countryDto != null) {
+
                 personAddressDto.setCountry(
                         CountryDto.builder()
                                 .countryId(address.getCountry())
@@ -603,12 +602,11 @@ public class PersonServiceImpl implements PersonService {
                                                     .build()
                                     ));
                         }
+
                     }
                 }
             }
-            return personAddressDto;
-        } catch (Exception e) {
-            throw new IllegalStateException("Error getting address: " + e.getMessage(), e);
         }
+        return personAddressDto;
     }
 }
