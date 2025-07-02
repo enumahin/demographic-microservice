@@ -2,6 +2,7 @@ package com.alienworkspace.cdr.demographic.controller;
 
 import com.alienworkspace.cdr.demographic.helpers.Constants;
 import com.alienworkspace.cdr.demographic.service.PersonService;
+import com.alienworkspace.cdr.model.dto.metadata.*;
 import com.alienworkspace.cdr.model.dto.person.*;
 import com.alienworkspace.cdr.model.helper.RecordVoidRequest;
 import com.alienworkspace.cdr.model.helper.ResponseDto;
@@ -19,6 +20,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -74,7 +76,7 @@ class PersonControllerTest {
     void testGetPerson() throws Exception {
         // given
         PersonDto person = personDtoBuilder.personId(1L).build();
-        when(personService.getPerson(1L)).thenReturn(person);
+        when(personService.getPerson(1L, false)).thenReturn(person);
 
         // when & then
         mockMvc.perform(get(Constants.PERSON_BASE_URL + "/{id}", 1L))
@@ -153,11 +155,12 @@ class PersonControllerTest {
         PersonNameDto nameDto = PersonNameDto.builder()
                 .firstName("John")
                 .lastName("Doe")
+                .personId(1L)
                 .preferred(true)
                 .build();
         PersonDto updatedPerson = personDtoBuilder.personId(1L).build();
         
-        when(personService.addPersonName(eq(1L), any(PersonNameDto.class))).thenReturn(updatedPerson);
+        when(personService.addPersonName(eq(1L), any(PersonNameDto.class))).thenReturn(nameDto);
 
         // when & then
         mockMvc.perform(post(Constants.PERSON_BASE_URL + "/{personId}/names", 1L)
@@ -175,16 +178,17 @@ class PersonControllerTest {
         PersonNameDto nameDto = PersonNameDto.builder()
                 .firstName("John")
                 .lastName("Doe")
+                .personId(1L)
                 .preferred(true)
                 .build();
         PersonDto updatedPerson = personDtoBuilder.personId(1L).build();
         
-        when(personService.updatePersonName(eq(1L), eq(1L), any(PersonNameDto.class))).thenReturn(updatedPerson);
+        when(personService.updatePersonName(eq(1L), eq(1L), any(Boolean.class))).thenReturn(nameDto);
 
         // when & then
         mockMvc.perform(put(Constants.PERSON_BASE_URL + "/{personId}/names/{nameId}", 1L, 1L)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(nameDto)))
+                .content(objectMapper.writeValueAsString(true)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.personId").value(1));
@@ -213,13 +217,22 @@ class PersonControllerTest {
     void testAddPersonAddress() throws Exception {
         // given
         PersonAddressDto addressDto = PersonAddressDto.builder()
+                .country(CountryDto.builder()
+                        .countryId(1).build())
+                .state(StateDto.builder().stateId(1).build())
+                .county(CountyDto.builder().countyId(1).build())
+                .city(CityDto.builder().cityId(1).build())
+                .community(CommunityDto.builder().communityId(1).build())
                 .addressLine1("123 Main St")
+                .addressLine2("Suite 123")
+                .addressLine3("test address line 3")
+                .startDate(LocalDate.of(2023, 1, 1))
                 .postalCode("12345")
                 .preferred(true)
                 .build();
         PersonDto updatedPerson = personDtoBuilder.personId(1L).build();
         
-        when(personService.addAddress(eq(1L), any(PersonAddressDto.class))).thenReturn(updatedPerson);
+        when(personService.addAddress(eq(1L), any(PersonAddressDto.class))).thenReturn(addressDto);
 
         // when & then
         mockMvc.perform(post(Constants.PERSON_BASE_URL + "/{personId}/addresses", 1L)
@@ -227,7 +240,7 @@ class PersonControllerTest {
                 .content(objectMapper.writeValueAsString(addressDto)))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.personId").value(1));
+                .andExpect(jsonPath("$").value(notNullValue()));
     }
 
     @Test
@@ -241,15 +254,14 @@ class PersonControllerTest {
                 .build();
         PersonDto updatedPerson = personDtoBuilder.personId(1L).build();
         
-        when(personService.updateAddress(eq(1L), eq(1L), any(PersonAddressDto.class))).thenReturn(updatedPerson);
+        when(personService.updateAddress(eq(1L), eq(1L), any(Boolean.class))).thenReturn(addressDto);
 
         // when & then
         mockMvc.perform(put(Constants.PERSON_BASE_URL + "/{personId}/addresses/{addressId}", 1L, 1L)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(addressDto)))
+                .content(objectMapper.writeValueAsString(true)))
                 .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.personId").value(1));
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -281,9 +293,8 @@ class PersonControllerTest {
                         .build())
                 .preferred(true)
                 .build();
-        PersonDto updatedPerson = personDtoBuilder.personId(1L).build();
         
-        when(personService.addAttribute(eq(1L), any(PersonAttributeDto.class))).thenReturn(updatedPerson);
+        when(personService.addAttribute(eq(1L), any(PersonAttributeDto.class))).thenReturn(attributeDto);
 
         // when & then
         mockMvc.perform(post(Constants.PERSON_BASE_URL + "/{personId}/attributes", 1L)
@@ -291,7 +302,7 @@ class PersonControllerTest {
                 .content(objectMapper.writeValueAsString(attributeDto)))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.personId").value(1));
+                .andExpect(jsonPath("$").value(notNullValue()));
     }
 
     @Test
@@ -305,17 +316,15 @@ class PersonControllerTest {
                         .build())
                 .preferred(true)
                 .build();
-        PersonDto updatedPerson = personDtoBuilder.personId(1L).build();
         
-        when(personService.updateAttribute(eq(1L), eq(1L), any(PersonAttributeDto.class))).thenReturn(updatedPerson);
+        when(personService.updateAttribute(eq(1L), eq(1L), any(Boolean.class))).thenReturn(attributeDto);
 
         // when & then
         mockMvc.perform(put(Constants.PERSON_BASE_URL + "/{personId}/attributes/{attributeId}", 1L, 1L)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(attributeDto)))
+                .content(objectMapper.writeValueAsString(true)))
                 .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.personId").value(1));
+                .andExpect(status().isOk());
     }
 
     @Test

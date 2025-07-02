@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Set;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -121,9 +122,9 @@ public class PersonController {
                     schema = @Schema(implementation = ErrorResponseDto.class)
             )
     )
-    @GetMapping("{id}")
-    public ResponseEntity<PersonDto> getPerson(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(personService.getPerson(id));
+    @GetMapping("{id}/{includeVoided}")
+    public ResponseEntity<PersonDto> getPerson(@PathVariable("id") long id, @PathVariable boolean includeVoided) {
+        return ResponseEntity.ok(personService.getPerson(id, includeVoided));
     }
 
     /**
@@ -190,7 +191,8 @@ public class PersonController {
             )
     )
     @PutMapping("/{id}")
-    public ResponseEntity<PersonDto> updatePerson(@PathVariable("id") Long id, @RequestBody PersonDto personDto) {
+    public ResponseEntity<PersonDto> updatePerson(@PathVariable("id") Long id,
+                                                  @Valid @RequestBody PersonDto personDto) {
         return ResponseEntity.ok(personService.updatePerson(id, personDto));
     }
 
@@ -259,8 +261,8 @@ public class PersonController {
             )
     )
     @PostMapping("/{personId}/names")
-    public ResponseEntity<PersonDto> addPersonName(@PathVariable("personId") long personId,
-                                                       @RequestBody PersonNameDto personNameDto) {
+    public ResponseEntity<PersonNameDto> addPersonName(@PathVariable("personId") long personId,
+                                                   @Valid @RequestBody PersonNameDto personNameDto) {
         return ResponseEntity.ok(personService.addPersonName(personId, personNameDto));
     }
 
@@ -269,7 +271,7 @@ public class PersonController {
      *
      * @param personId the ID of the person to update the name for
      * @param personNameId the ID of the person name to update
-     * @param personNameDto the data transfer object containing the updated details of the person name
+     * @param preferred the preferred name
      * @return the updated person name as a PersonNameDto
      */
     @Operation(
@@ -291,10 +293,10 @@ public class PersonController {
             )
     )
     @PutMapping("/{personId}/names/{personNameId}")
-    public ResponseEntity<PersonDto> updatePersonName(@PathVariable("personId") long personId,
-                                                       @PathVariable("personNameId") long personNameId,
-                                                       @RequestBody PersonNameDto personNameDto) {
-        return ResponseEntity.ok(personService.updatePersonName(personId, personNameId, personNameDto));
+    public ResponseEntity<PersonNameDto> updatePersonName(@PathVariable("personId") long personId,
+                                                      @PathVariable("personNameId") long personNameId,
+                                                      @RequestBody boolean preferred) {
+        return ResponseEntity.ok(personService.updatePersonName(personId, personNameId, preferred));
     }
 
     /**
@@ -324,8 +326,8 @@ public class PersonController {
     )
     @DeleteMapping("/{personId}/names/{personNameId}")
     public void deletePersonName(@PathVariable("personId") long personId,
-                                                      @PathVariable("personNameId") long personNameId,
-                                                      @RequestBody RecordVoidRequest voidRequest) {
+                                 @PathVariable("personNameId") long personNameId,
+                                 @RequestBody RecordVoidRequest voidRequest) {
         personService.deletePersonName(personId, personNameId, voidRequest);
     }
 
@@ -356,8 +358,8 @@ public class PersonController {
     )
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/{personId}/addresses")
-    public ResponseEntity<PersonDto> addPersonAddress(@PathVariable("personId") long personId,
-                                                       @RequestBody PersonAddressDto personAddressDto) {
+    public ResponseEntity<PersonAddressDto> addPersonAddress(@PathVariable("personId") long personId,
+                                                      @Valid @RequestBody PersonAddressDto personAddressDto) {
         return ResponseEntity.ok(personService.addAddress(personId, personAddressDto));
     }
 
@@ -366,7 +368,7 @@ public class PersonController {
      *
      * @param personId the ID of the person to update the address for
      * @param personAddressId the ID of the person address to update
-     * @param personAddressDto the data transfer object containing the updated details of the person address
+     * @param preferred the preferred address
      * @return the updated person address as a PersonAddressDto
      */
     @Operation(
@@ -388,10 +390,70 @@ public class PersonController {
             )
     )
     @PutMapping("/{personId}/addresses/{personAddressId}")
-    public ResponseEntity<PersonDto> updatePersonAddress(@PathVariable("personId") long personId,
-                                                       @PathVariable("personAddressId") long personAddressId,
-                                                       @RequestBody PersonAddressDto personAddressDto) {
-        return ResponseEntity.ok(personService.updateAddress(personId, personAddressId, personAddressDto));
+    public ResponseEntity<PersonAddressDto> updatePersonAddress(@PathVariable("personId") long personId,
+                                                         @PathVariable("personAddressId") long personAddressId,
+                                                         @RequestBody boolean preferred) {
+        return ResponseEntity.ok(personService.updateAddress(personId, personAddressId, preferred));
+    }
+
+    /**
+     * Retrieves a person address by its ID.
+     *
+     * @param personId the ID of the person to retrieve the address from
+     * @param personAddressId the ID of the person address to retrieve
+     * @return the person address with the specified ID as a PersonAddressDto
+     */
+    @Operation(
+            summary = "Get Person Address REST API Endpoint",
+            description = "Endpoint to get a person address record.")
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "Http Status OK",
+            content = @Content(
+                    schema = @Schema(implementation = ResponseDto.class)
+            )
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Http Status INTERNAL_SERVER_ERROR",
+            content = @Content(
+                    schema = @Schema(implementation = ErrorResponseDto.class)
+            )
+    )
+    @GetMapping("/{personId}/addresses/{personAddressId}")
+    public ResponseEntity<PersonAddressDto> getPersonAddress(@PathVariable("personId") long personId,
+                                    @PathVariable("personAddressId") long personAddressId) {
+        return ResponseEntity.ok().body(personService.getPersonAddress(personId, personAddressId));
+    }
+
+    /**
+     * Retrieves all person addresses for a person.
+     *
+     * @param personId the ID of the person to retrieve addresses for
+     * @return a list of all person addresses for the specified person as a Set of PersonAddressDto objects
+     */
+    @Operation(
+            summary = "Get Person Addresses REST API Endpoint",
+            description = "Endpoint to get all person addresses for a person.")
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "Http Status OK",
+            content = @Content(
+                    schema = @Schema(implementation = ResponseDto.class)
+            )
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Http Status INTERNAL_SERVER_ERROR",
+            content = @Content(
+                    schema = @Schema(implementation = ErrorResponseDto.class)
+            )
+    )
+    @GetMapping("/{personId}/addresses")
+    public ResponseEntity<Set<PersonAddressDto>> getPersonAddresses(@PathVariable("personId") long personId) {
+        return ResponseEntity.ok().body(personService.getPersonAddresses(personId));
     }
 
     /**
@@ -421,8 +483,8 @@ public class PersonController {
     )
     @DeleteMapping("/{personId}/addresses/{personAddressId}")
     public void deletePersonAddress(@PathVariable("personId") long personId,
-                                                      @PathVariable("personAddressId") long personAddressId,
-                                                      @RequestBody RecordVoidRequest voidRequest) {
+                                    @PathVariable("personAddressId") long personAddressId,
+                                    @RequestBody RecordVoidRequest voidRequest) {
         personService.deleteAddress(personId, personAddressId, voidRequest);
     }
 
@@ -453,8 +515,8 @@ public class PersonController {
     )
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/{personId}/attributes")
-    public ResponseEntity<PersonDto> addPersonAttribute(@PathVariable("personId") long personId,
-                                                       @RequestBody PersonAttributeDto personAttributeDto) {
+    public ResponseEntity<PersonAttributeDto> addPersonAttribute(@PathVariable("personId") long personId,
+                                                        @Valid @RequestBody PersonAttributeDto personAttributeDto) {
         return ResponseEntity.ok(personService.addAttribute(personId, personAttributeDto));
     }
 
@@ -463,7 +525,7 @@ public class PersonController {
      *
      * @param personId the ID of the person to update the attribute for
      * @param personAttributeId the ID of the person attribute to update
-     * @param personAttributeDto the data transfer object containing the updated details of the person attribute
+     * @param preferred the preferred attribute
      * @return the updated person attribute as a PersonAttributeDto
      */
     @Operation(
@@ -485,10 +547,10 @@ public class PersonController {
             )
     )
     @PutMapping("/{personId}/attributes/{personAttributeId}")
-    public ResponseEntity<PersonDto> updatePersonAttribute(@PathVariable("personId") long personId,
-                                                       @PathVariable("personAttributeId") long personAttributeId,
-                                                       @RequestBody PersonAttributeDto personAttributeDto) {
-        return ResponseEntity.ok(personService.updateAttribute(personId, personAttributeId, personAttributeDto));
+    public ResponseEntity<PersonAttributeDto> updatePersonAttribute(@PathVariable("personId") long personId,
+                                                           @PathVariable("personAttributeId") long personAttributeId,
+                                                           @RequestBody boolean preferred) {
+        return ResponseEntity.ok(personService.updateAttribute(personId, personAttributeId, preferred));
     }
 
     /**
@@ -517,8 +579,8 @@ public class PersonController {
     )
     @DeleteMapping("/{personId}/attributes/{personAttributeId}")
     public void deletePersonAttribute(@PathVariable("personId") long personId,
-                                                      @PathVariable("personAttributeId") long personAttributeId,
-                                                      @RequestBody RecordVoidRequest voidRequest) {
+                                      @PathVariable("personAttributeId") long personAttributeId,
+                                      @RequestBody RecordVoidRequest voidRequest) {
         personService.deleteAttribute(personId, personAttributeId, voidRequest);
     }
 }

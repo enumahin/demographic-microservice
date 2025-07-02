@@ -3,6 +3,7 @@ package com.alienworkspace.cdr.demographic.model.mapper;
 import com.alienworkspace.cdr.demographic.model.Person;
 import com.alienworkspace.cdr.demographic.model.audit.AuditTrailMapper;
 import com.alienworkspace.cdr.model.dto.person.PersonDto;
+import java.util.stream.Collectors;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -35,11 +36,9 @@ public interface PersonMapper {
                 .causeOfDeath(person.getCauseOfDeath())
                 .name(person.getNames().stream()
                         .map(PersonNameMapper.INSTANCE::personNameToPersonNameDto)
-                        .toList())
-                .address(person.getAddresses().stream()
-                        .map(PersonAddressMapper.INSTANCE::toDto)
-                        .toList())
-                .attributes(person.getAttributes().stream().map(PersonAttributeMapper.INSTANCE::toDto).toList())
+                        .collect(Collectors.toSet()))
+                .attributes(person.getAttributes().stream().map(PersonAttributeMapper.INSTANCE::toDto)
+                        .collect(Collectors.toSet()))
                 .build();
         AuditTrailMapper.mapToDto(person, personDto);
         return personDto;

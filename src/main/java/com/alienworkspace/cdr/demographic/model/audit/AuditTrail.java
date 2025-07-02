@@ -3,9 +3,9 @@ package com.alienworkspace.cdr.demographic.model.audit;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.PrePersist;
 import java.time.LocalDateTime;
 import java.util.UUID;
-import jakarta.persistence.PrePersist;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -71,6 +71,9 @@ public class AuditTrail {
     @Column(name = "uuid", updatable = false, nullable = false, unique = true)
     private String uuid = UUID.randomUUID().toString();
 
+    /**
+     * Generate a UUID for the entity if it doesn't already have one.
+     */
     @PrePersist
     public void generateUuid() {
         if (uuid == null) {

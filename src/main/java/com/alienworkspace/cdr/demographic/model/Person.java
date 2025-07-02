@@ -6,6 +6,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -65,19 +66,19 @@ public class Person extends AuditTrail {
     private String causeOfDeath;
 
     @Setter
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "person_id", nullable = false)
     @Builder.Default
     private Set<PersonName> names = new HashSet<>();
 
     @Setter
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "person_id")
     @Builder.Default
     private Set<PersonAddress> addresses = new HashSet<>();
 
     @Setter
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "person_id")
     @Builder.Default
     private Set<PersonAttribute> attributes = new HashSet<>();

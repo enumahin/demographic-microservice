@@ -5,11 +5,13 @@ import com.google.common.base.MoreObjects;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -39,8 +41,9 @@ public class PersonName extends AuditTrail {
     @Column(name = "person_name_id")
     private long personNameId;
 
-    @ManyToOne
-    @JoinColumn(name = "person_id", insertable = false, updatable = false)
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "person_id", insertable = false, updatable = false, nullable = false)
     private Person person;
 
     @Column(name = "first_name")

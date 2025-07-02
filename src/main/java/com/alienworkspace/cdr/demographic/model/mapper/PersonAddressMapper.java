@@ -33,11 +33,6 @@ public interface PersonAddressMapper {
     default PersonAddressDto toDto(PersonAddress personAddress) {
         PersonAddressDto  personAddressDto = PersonAddressDto.builder()
                 .personAddressId(personAddress.getPersonAddressId())
-                .country(new CountryDto())
-                .state(new StateDto())
-                .county(new CountyDto())
-                .city(new CityDto())
-                .community(new CommunityDto())
                 .addressLine1(personAddress.getAddressLine1())
                 .addressLine2(personAddress.getAddressLine2())
                 .addressLine3(personAddress.getAddressLine3())

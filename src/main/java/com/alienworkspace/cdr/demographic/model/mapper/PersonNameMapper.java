@@ -1,6 +1,7 @@
 package com.alienworkspace.cdr.demographic.model.mapper;
 
 import com.alienworkspace.cdr.demographic.model.PersonName;
+import com.alienworkspace.cdr.demographic.model.audit.AuditTrailMapper;
 import com.alienworkspace.cdr.model.dto.person.PersonNameDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -36,15 +37,7 @@ public interface PersonNameMapper {
         if (personName.getPerson() != null) {
             personNameDto.setPersonId(personName.getPerson().getPersonId());
         }
-        personNameDto.setCreatedAt(personName.getCreatedAt());
-        personNameDto.setCreatedBy(personName.getCreatedBy());
-        personNameDto.setLastModifiedAt(personName.getLastModifiedAt());
-        personNameDto.setLastModifiedBy(personName.getLastModifiedBy());
-        personNameDto.setVoided(personName.isVoided());
-        personNameDto.setVoidedAt(personName.getVoidedAt());
-        personNameDto.setVoidedBy(personName.getVoidedBy());
-        personNameDto.setVoidReason(personName.getVoidReason());
-        personNameDto.setUuid(personName.getUuid());
+        AuditTrailMapper.mapToDto(personName, personNameDto);
         return personNameDto;
     }
 
