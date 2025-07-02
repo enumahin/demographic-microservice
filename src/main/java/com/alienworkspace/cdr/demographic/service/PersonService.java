@@ -30,7 +30,7 @@ public interface PersonService {
      * @param includeVoided a flag indicating whether to include voided records
      * @return a PersonDto object containing the data of the person with the given ID
      */
-    PersonDto getPerson(Long personId, boolean includeVoided);
+    PersonDto getPerson(String correlationId, Long personId, boolean includeVoided);
 
     /**
      * Adds a new person to the system.
@@ -38,7 +38,7 @@ public interface PersonService {
      * @param personDto the PersonDto object containing the data of the person to be added
      * @return a PersonDto object containing the data of the newly added person
      */
-    PersonDto addPerson(PersonDto personDto);
+    PersonDto addPerson(PersonDto personDto, String correlationId);
 
     /**
      * Updates an existing person in the system.
@@ -47,7 +47,7 @@ public interface PersonService {
      * @param personDto the PersonDto object containing the updated data of the person
      * @return a PersonDto object containing the updated data of the person
      */
-    PersonDto updatePerson(long personId, PersonDto personDto);
+    PersonDto updatePerson(long personId, PersonDto personDto, String correlationId);
 
     /**
      * Deletes a person by their ID.
@@ -83,7 +83,7 @@ public interface PersonService {
      * @param personAddressDto the PersonAddressDto object containing the data of the person address to be added
      * @return a PersonAddressDto object containing the data of the newly added person address
      */
-    PersonAddressDto addAddress(Long personId, PersonAddressDto personAddressDto);
+    PersonAddressDto addAddress(Long personId, PersonAddressDto personAddressDto, String correlationId);
 
     /**
      * Adds a new person attribute to the system.
@@ -112,7 +112,7 @@ public interface PersonService {
      * @param preferred the preferred address
      * @return a PersonAddressDto object containing the updated data of the person address
      */
-    PersonAddressDto updateAddress(long personId, long personAddressId, boolean preferred);
+    PersonAddressDto updateAddress(long personId, long personAddressId, boolean preferred, String correlationId);
 
     /**
      * Updates an existing person attribute in the system.

@@ -86,7 +86,7 @@ public class PersonServiceTest {
         when(personMapper.personToPersonDto(savedPerson)).thenReturn(personDto);
 
         // when
-        PersonDto response = personService.addPerson(personDtoBuilder.build());
+        PersonDto response = personService.addPerson(personDtoBuilder.build(), "CORRELATION-ID");
 
         // then
         assertEquals(personDto.getPersonId(), response.getPersonId());
@@ -106,7 +106,7 @@ public class PersonServiceTest {
         when(personRepository.save(any(Person.class))).thenThrow(NullPointerException.class);
 
         // when
-        assertThrows(RuntimeException.class, () -> personService.addPerson(personDto));
+        assertThrows(RuntimeException.class, () -> personService.addPerson(personDto, "CORRELATION-ID"));
 
         // then - throw exception
     }
@@ -118,7 +118,7 @@ public class PersonServiceTest {
         when(personMapper.personToPersonDto(savedPerson)).thenReturn(personDto);
 
         // when
-        PersonDto response = personService.getPerson(1L, false);
+        PersonDto response = personService.getPerson("CORRELATION-ID", 1L, false);
 
         // then
         assertEquals(personDto.getPersonId(), response.getPersonId());
@@ -135,7 +135,7 @@ public class PersonServiceTest {
         // given
 
         // when
-        assertThrows(ResourceNotFoundException.class, () -> personService.getPerson(1L, false));
+        assertThrows(ResourceNotFoundException.class, () -> personService.getPerson("CORRELATION-ID", 1L, false));
 
         // then - throw exception
     }
@@ -173,7 +173,7 @@ public class PersonServiceTest {
         when(personMapper.personToPersonDto(any(Person.class))).thenReturn(updatedPersonDto);
 
         // when
-        PersonDto response = personService.updatePerson(personDto.getPersonId(), personDto);
+        PersonDto response = personService.updatePerson(personDto.getPersonId(), personDto, "CORRELATION-ID");
 
         // then
         assertEquals(updatedPersonDto, response);
@@ -192,7 +192,7 @@ public class PersonServiceTest {
 
         // when
         assertThrows(ResourceNotFoundException.class, () -> personService.updatePerson(1L, personDtoBuilder.personId(1L)
-                .build()));
+                .build(), "CORRELATION-ID"));
 
         // then - throw exception
         verify(personRepository, never()).save(any(Person.class));

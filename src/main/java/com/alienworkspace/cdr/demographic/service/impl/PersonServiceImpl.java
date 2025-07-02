@@ -66,14 +66,14 @@ public class PersonServiceImpl implements PersonService {
      * @return a PersonDto representation of the person with the given ID
      */
     @Override
-    public PersonDto getPerson(Long personId, boolean includeVoided) {
+    public PersonDto getPerson(String correlationId, Long personId, boolean includeVoided) {
         if (personId == null) {
             throw new ResourceNotFoundException("PersonId can nul be null");
         }
         return personRepository.findCompleteById(personId)
                 .map(person -> {
                     PersonDto personDto = personMapper.personToPersonDto(person);
-                    fetchPersonAddresses(person, personDto);
+                    fetchPersonAddresses(correlationId, person, personDto);
                     if (!includeVoided) {
                         personDto.setName(person.getNames().stream()
                                 .filter(name -> !name.isVoided())
@@ -119,7 +119,7 @@ public class PersonServiceImpl implements PersonService {
      * @return a PersonDto representation of the newly added person
      */
     @Override
-    public PersonDto addPerson(PersonDto personDto) {
+    public PersonDto addPerson(PersonDto personDto, String correlationId) {
         try {
             logger.info("Adding person: {}", personDto);
             Person person = personMapper.personDtoToPerson(personDto);
@@ -141,7 +141,7 @@ public class PersonServiceImpl implements PersonService {
                     ));
             personRepository.save(savedPerson);
             PersonDto savedPersonDto = personMapper.personToPersonDto(savedPerson);
-            fetchPersonAddresses(savedPerson, savedPersonDto);
+            fetchPersonAddresses(correlationId, savedPerson, savedPersonDto);
             return savedPersonDto;
         } catch (Exception e) {
             logger.error("Error adding person:", e);
@@ -156,7 +156,7 @@ public class PersonServiceImpl implements PersonService {
      * @return a PersonDto representation of the updated person
      */
     @Override
-    public PersonDto updatePerson(long personId, PersonDto personDto) {
+    public PersonDto updatePerson(long personId, PersonDto personDto, String correlationId) {
         if (personDto.getPersonId() == null) {
             throw new ResourceNotFoundException("PersonId can not be null.");
         }
@@ -164,7 +164,7 @@ public class PersonServiceImpl implements PersonService {
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("PersonId of %d not found",
                         personDto.getPersonId())));
         PersonDto updatedPerson = personMapper.personToPersonDto(updatePerson(person, personDto));
-        fetchPersonAddresses(person, updatedPerson);
+        fetchPersonAddresses(correlationId, person, updatedPerson);
         return updatedPerson;
     }
 
@@ -283,12 +283,12 @@ public class PersonServiceImpl implements PersonService {
      */
     @Override
     @Transactional
-    public PersonAddressDto addAddress(Long personId, PersonAddressDto personAddressDto) {
+    public PersonAddressDto addAddress(Long personId, PersonAddressDto personAddressDto, String correlationId) {
         return personRepository.findCompleteById(personId)
                 .map(person -> {
                     person.addAddress(personAddressMapper.toEntity(personAddressDto));
                     Person savedPerson = personRepository.save(person);
-                    return fetchAddress(savedPerson.getAddresses().stream()
+                    return fetchAddress(correlationId, savedPerson.getAddresses().stream()
                             .filter(address ->
                                     Objects.equals(address.getAddressLine1(), personAddressDto.getAddressLine1())
                                     && Objects.equals(address.getAddressLine2(), personAddressDto.getAddressLine2()))
@@ -364,7 +364,8 @@ public class PersonServiceImpl implements PersonService {
      * @return a PersonDto representation of the person with the updated address
      */
     @Override
-    public PersonAddressDto updateAddress(long personId, long personAddressId, boolean preferred) {
+    public PersonAddressDto updateAddress(long personId, long personAddressId, boolean preferred,
+                                          String correlationId) {
         Person person = getPerson(personId);
         return person.getAddresses().stream()
                 .filter(address -> address.getPersonAddressId() == personAddressId)
@@ -376,7 +377,7 @@ public class PersonServiceImpl implements PersonService {
                         address.setLastModifiedAt(LocalDateTime.now());
                         address.setLastModifiedBy(CurrentUser.getCurrentUser().getPersonId());
                         personRepository.save(person);
-                        return fetchAddress(person.getPreferredAddress());
+                        return fetchAddress(correlationId, person.getPreferredAddress());
                     } else {
                         throw new IllegalArgumentException(
                                 "Preferred address cannot be updated, add another preferred address instead");
@@ -513,7 +514,7 @@ public class PersonServiceImpl implements PersonService {
                 .orElseThrow(() -> new ResourceNotFoundException("Person not found"));
     }
 
-    private void fetchPersonAddresses(Person person, PersonDto personDto) {
+    private void fetchPersonAddresses(String correlationId, Person person, PersonDto personDto) {
 
         if (personDto.getAddress() == null) {
             personDto.setAddress(new HashSet<>());
@@ -523,7 +524,7 @@ public class PersonServiceImpl implements PersonService {
             person.getAddresses()
                     .forEach(address -> {
                         try {
-                            PersonAddressDto perssonAddressDto = fetchAddress(address);
+                            PersonAddressDto perssonAddressDto = fetchAddress(correlationId, address);
                             if (perssonAddressDto != null) {
                                 Set<PersonAddressDto> personAddressDtos = new HashSet<>(personDto.getAddress());
                                 personAddressDtos.add(perssonAddressDto);
@@ -539,14 +540,14 @@ public class PersonServiceImpl implements PersonService {
         }
     }
 
-    private PersonAddressDto fetchAddress(PersonAddress address) {
+    private PersonAddressDto fetchAddress(String correlationId, PersonAddress address) {
         try {
             if (address == null) {
                 return null;
             }
             PersonAddressDto personAddressDto = personAddressMapper.toDto(address);
             if (address.getCountry() > 0) {
-                CountryDto countryDto = metadataFeignClient.getPersonLocation(address.getCountry(),
+                CountryDto countryDto = metadataFeignClient.getPersonLocation(correlationId, address.getCountry(),
                         address.getState(), address.getCounty(), address.getCity(), address.getCommunity()).getBody();
                 if (countryDto == null) {
                     throw new IllegalStateException("Error getting country");
