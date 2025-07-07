@@ -131,7 +131,7 @@ public class PersonController {
     @GetMapping("{id}/{includeVoided}")
     public ResponseEntity<PersonDto> getPerson(@RequestHeader("X-cdr-correlation-id") String correlationId,
                                                @PathVariable("id") long id, @PathVariable boolean includeVoided) {
-        log.debug("Retrieving person with ID: {} with correlationId: {}", id, correlationId);
+        log.debug("Retrieving person with ID: {}", id);
         return ResponseEntity.ok(personService.getPerson(correlationId, id, includeVoided));
     }
 
