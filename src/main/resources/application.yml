@@ -46,6 +46,10 @@ management:
   info:
     env:
       enabled: true # Enable display of the microservice info in the actuator endpoints
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
 eureka:
   instance:
     preferIpAddress: true # prefer the IP address the client registered with
@@ -67,6 +71,8 @@ logging:
       alienworkspace:
         cdr:
           demographic: DEBUG
+  pattern:
+    level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
 
 resilience4j:
   circuitbreaker:
