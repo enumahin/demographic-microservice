@@ -34,7 +34,7 @@ public interface PersonAttributeMapper {
                 .preferred(personAttribute.isPreferred())
                 .build();
         if (personAttribute.getPerson() != null) {
-            personAttributeDto.setPerson_id(personAttribute.getPerson().getPersonId());
+            personAttributeDto.setPersonId(personAttribute.getPerson().getPersonId());
         }
         AuditTrailMapper.mapToDto(personAttribute, personAttributeDto);
         return personAttributeDto;

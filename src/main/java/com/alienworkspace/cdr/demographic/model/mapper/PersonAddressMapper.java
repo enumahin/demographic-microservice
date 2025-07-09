@@ -56,11 +56,11 @@ public interface PersonAddressMapper {
      */
     default PersonAddress toEntity(PersonAddressDto personAddressDto) {
         PersonAddress personAddress = PersonAddress.builder()
-                .country(personAddressDto.getCountry().getCountryId())
-                .state(personAddressDto.getState().getStateId())
-                .county(personAddressDto.getCounty().getCountyId())
-                .city(personAddressDto.getCity().getCityId())
-                .community(personAddressDto.getCommunity().getCommunityId())
+                .country(personAddressDto.getCountry() == null ? 0 : personAddressDto.getCountry().getCountryId())
+                .state(personAddressDto.getState() == null ? 0 : personAddressDto.getState().getStateId())
+                .county(personAddressDto.getCounty() == null ? 0 : personAddressDto.getCounty().getCountyId())
+                .city(personAddressDto.getCity() == null ? 0 : personAddressDto.getCity().getCityId())
+                .community(personAddressDto.getCommunity() == null ? 0 : personAddressDto.getCommunity().getCommunityId())
                 .addressLine1(personAddressDto.getAddressLine1())
                 .addressLine2(personAddressDto.getAddressLine2())
                 .addressLine3(personAddressDto.getAddressLine3())

@@ -20,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -79,7 +78,7 @@ public class PersonServiceIntegrationTest extends AbstractionContainerBaseTest {
                 .addressLine3("test address line 3")
                 .postalCode("test postal code");
 
-        when(metadataFeignClient.getCountry("CORRELATION-ID", 1)).thenReturn(
+        when(metadataFeignClient.getCountry(1)).thenReturn(
                         ResponseEntity.ok(CountryDto.builder().countryId(1).countryName("test country").build()));
 
         when(metadataFeignClient.getPersonLocation(1, 1, 1, 1, 1,
@@ -97,7 +96,7 @@ public class PersonServiceIntegrationTest extends AbstractionContainerBaseTest {
                 .build();
 
         // when
-        PersonDto response = personService.addPerson(personDto, "CORRELATION-ID");
+        PersonDto response = personService.addPerson(personDto);
 
         // then
         assertEquals(personDto.getGender(), response.getGender());
@@ -118,14 +117,14 @@ public class PersonServiceIntegrationTest extends AbstractionContainerBaseTest {
 
 
         // when
-        PersonDto savedPerson = personService.addPerson(personDto, "CORRELATION-ID");
+        PersonDto savedPerson = personService.addPerson(personDto);
         PersonDto update = PersonDto.builder()
                 .personId(savedPerson.getPersonId())
                 .address(new HashSet<>())
                 .gender('M')
                 .birthDate(LocalDate.parse("2000-01-01"))
                 .build();
-        PersonDto updatedPerson = personService.updatePerson(update.getPersonId(), update, "CORRELATION-ID");
+        PersonDto updatedPerson = personService.updatePerson(update.getPersonId(), update);
 
         // then
         assertNotEquals(savedPerson.getGender(), updatedPerson.getGender());
@@ -146,8 +145,8 @@ public class PersonServiceIntegrationTest extends AbstractionContainerBaseTest {
                 .build();
 
         // when
-        PersonDto saved = personService.addPerson(personDto, "CORRELATION-ID");
-        PersonDto response = personService.getPerson("CORRELATION-ID", saved.getPersonId(), false);
+        PersonDto saved = personService.addPerson(personDto);
+        PersonDto response = personService.getPerson(saved.getPersonId(), false);
 
         // then
         assertEquals(saved.getGender(), response.getGender());
@@ -171,8 +170,8 @@ public class PersonServiceIntegrationTest extends AbstractionContainerBaseTest {
                 .build();
 
         // when
-        personService.addPerson(personDto, "CORRELATION-ID");
-        personService.addPerson(personDto2, "CORRELATION-ID");
+        personService.addPerson(personDto);
+        personService.addPerson(personDto2);
         List<PersonDto> response = personService.getPersons();
 
         // then
@@ -190,13 +189,13 @@ public class PersonServiceIntegrationTest extends AbstractionContainerBaseTest {
 
 
         // when
-        PersonDto savedPerson = personService.addPerson(personDto, "CORRELATION-ID");
+        PersonDto savedPerson = personService.addPerson(personDto);
         RecordVoidRequest request = RecordVoidRequest.builder()
                 .voidReason("Test void reason")
                 .build();
 
         ResponseDto response = personService.deletePerson(savedPerson.getPersonId(), request);
-        PersonDto deletedPerson = personService.getPerson("CORRELATION-ID", savedPerson.getPersonId(), true);
+        PersonDto deletedPerson = personService.getPerson(savedPerson.getPersonId(), true);
 
         // then
         assertEquals("Person deleted successfully", response.getStatusMessage());
@@ -212,7 +211,7 @@ public class PersonServiceIntegrationTest extends AbstractionContainerBaseTest {
         // given
         PersonDto personDto = personDtoBuilder.build();
         PersonNameDto personNameDto = personNameDtoBuilder.build();
-        PersonDto savedPerson = personService.addPerson(personDto, "CORRELATION-ID");
+        PersonDto savedPerson = personService.addPerson(personDto);
 
         // when
         PersonNameDto savedPersonName = personService.addPersonName(savedPerson.getPersonId(), personNameDto);
@@ -231,13 +230,13 @@ public class PersonServiceIntegrationTest extends AbstractionContainerBaseTest {
         // given
         PersonDto personDto = personDtoBuilder.build();
         PersonNameDto personNameDto = personNameDtoBuilder.build();
-        PersonDto savedPerson = personService.addPerson(personDto, "CORRELATION-ID");
+        PersonDto savedPerson = personService.addPerson(personDto);
 
         // when
         PersonNameDto savedPersonName = personService.addPersonName(savedPerson.getPersonId(), personNameDto);
         PersonNameDto savedPersonName2 = personService.addPersonName(savedPerson.getPersonId(),
                 personNameDtoBuilder.firstName("Queen").build());
-        PersonDto updatedPerson = personService.getPerson("CORRELATION-ID",savedPerson.getPersonId(), false);
+        PersonDto updatedPerson = personService.getPerson(savedPerson.getPersonId(), false);
 
         // then
         assertNotNull(savedPersonName);
@@ -253,13 +252,13 @@ public class PersonServiceIntegrationTest extends AbstractionContainerBaseTest {
         // given
         PersonDto personDto = personDtoBuilder.build();
         PersonNameDto personNameDto = personNameDtoBuilder.build();
-        PersonDto savedPerson = personService.addPerson(personDto, "CORRELATION-ID");
+        PersonDto savedPerson = personService.addPerson(personDto);
 
         // when
         PersonNameDto savedPersonName = personService.addPersonName(savedPerson.getPersonId(), personNameDto);
         PersonNameDto savedPersonName2 = personService.addPersonName(savedPerson.getPersonId(),
                 personNameDtoBuilder.firstName("Queen").preferred(true).build());
-        PersonDto updatedPerson = personService.getPerson("CORRELATION-ID", savedPerson.getPersonId(), false);
+        PersonDto updatedPerson = personService.getPerson(savedPerson.getPersonId(), false);
 
         // then
         assertNotNull(savedPerson);
@@ -282,12 +281,12 @@ public class PersonServiceIntegrationTest extends AbstractionContainerBaseTest {
         // given
         PersonDto personDto = personDtoBuilder.build();
         PersonAddressDto personAddressDto = personAddressDtoBuilder.build();
-        PersonDto savedPerson = personService.addPerson(personDto, "CORRELATION-ID");
+        PersonDto savedPerson = personService.addPerson(personDto);
 
         // when
-        PersonAddressDto savedPersonAddressDto = personService.addAddress(savedPerson.getPersonId(), personAddressDto, "CORRELATION-ID");
+        PersonAddressDto savedPersonAddressDto = personService.addAddress(savedPerson.getPersonId(), personAddressDto);
 
-        PersonDto updatedPerson = personService.getPerson("CORRELATION-ID", savedPerson.getPersonId(), false);
+        PersonDto updatedPerson = personService.getPerson(savedPerson.getPersonId(), false);
         // then
         assertNotNull(savedPerson);
         assertNotNull(savedPersonAddressDto);
@@ -301,13 +300,13 @@ public class PersonServiceIntegrationTest extends AbstractionContainerBaseTest {
         // given
         PersonDto personDto = personDtoBuilder.build();
         PersonAddressDto personAddressDto = personAddressDtoBuilder.build();
-        PersonDto savedPerson = personService.addPerson(personDto, "CORRELATION-ID");
+        PersonDto savedPerson = personService.addPerson(personDto);
 
         // when
-        PersonAddressDto savedPersonAddressDto = personService.addAddress(savedPerson.getPersonId(), personAddressDto, "CORRELATION-ID");
+        PersonAddressDto savedPersonAddressDto = personService.addAddress(savedPerson.getPersonId(), personAddressDto);
         PersonAddressDto savedPersonAddressDto2 = personService.addAddress(savedPerson.getPersonId(), personAddressDtoBuilder
-                .addressLine1("Another Address").preferred(false).build(), "CORRELATION-ID");
-        PersonDto updatedPerson = personService.getPerson("CORRELATION-ID", savedPerson.getPersonId(), false);
+                .addressLine1("Another Address").preferred(false).build());
+        PersonDto updatedPerson = personService.getPerson(savedPerson.getPersonId(), false);
 
         // then
         System.out.println(updatedPerson);
@@ -331,13 +330,13 @@ public class PersonServiceIntegrationTest extends AbstractionContainerBaseTest {
         // given
         PersonDto personDto = personDtoBuilder.build();
         PersonAddressDto personAddressDto = personAddressDtoBuilder.build();
-        PersonDto savedPerson = personService.addPerson(personDto, "CORRELATION-ID");
+        PersonDto savedPerson = personService.addPerson(personDto);
 
         // when
-        PersonAddressDto savedPersonAddressDto = personService.addAddress(savedPerson.getPersonId(), personAddressDto, "CORRELATION-ID");
+        PersonAddressDto savedPersonAddressDto = personService.addAddress(savedPerson.getPersonId(), personAddressDto);
         PersonAddressDto savedPersonAddressDto2 = personService.addAddress(savedPerson.getPersonId(),
-                personAddressDtoBuilder.addressLine1("Another Address").preferred(true).build(), "CORRELATION-ID");
-        PersonDto updatedPerson = personService.getPerson("CORRELATION-ID", savedPerson.getPersonId(), false);
+                personAddressDtoBuilder.addressLine1("Another Address").preferred(true).build());
+        PersonDto updatedPerson = personService.getPerson(savedPerson.getPersonId(), false);
 
         // then
         assertNotNull(savedPersonAddressDto);
@@ -359,12 +358,12 @@ public class PersonServiceIntegrationTest extends AbstractionContainerBaseTest {
         // given
         PersonDto personDto = personDtoBuilder.build();
         PersonAttributeDto personAttributeDto = personAttributeDtoBuilder.build();
-        PersonDto savedPerson = personService.addPerson(personDto, "CORRELATION-ID");
+        PersonDto savedPerson = personService.addPerson(personDto);
 
         // when
         PersonAttributeDto savedPersonAttribute = personService.addAttribute(savedPerson.getPersonId(),
                 personAttributeDto);
-        PersonDto updatedPerson = personService.getPerson("CORRELATION-ID", savedPerson.getPersonId(), false);
+        PersonDto updatedPerson = personService.getPerson(savedPerson.getPersonId(), false);
 
         // then
         assertNotNull(savedPerson);

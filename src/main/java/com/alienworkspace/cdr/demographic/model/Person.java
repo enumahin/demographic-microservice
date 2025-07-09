@@ -18,6 +18,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -39,10 +41,11 @@ import lombok.Setter;
 @Table(name = "person")
 public class Person extends AuditTrail {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "person_id")
     @Getter
+    @Setter
+    @Id
+    @NotNull
+    @Column(name = "person_id", nullable = false)
     private long personId;
 
     @Getter

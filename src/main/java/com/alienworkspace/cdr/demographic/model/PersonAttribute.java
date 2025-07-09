@@ -32,9 +32,11 @@ import lombok.Setter;
 @SuppressFBWarnings({"EI_EXPOSE_REP", "EI_EXPOSE_REP2"})
 public class PersonAttribute extends AuditTrail {
 
+    @Getter
+    @Setter
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "person_attribute_id")
+    @NotNull
+    @Column(name = "person_attribute_id", nullable = false)
     private long personAttributeId;
 
     @NotNull

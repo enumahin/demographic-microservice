@@ -13,7 +13,6 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
 
 /**
  * Feign client for interacting with the metadata service.
@@ -36,23 +35,21 @@ public interface MetadataFeignClient {
      * @return The country.
      */
     @GetMapping(METADATA_BASE_URL + "/countries/{id}")
-    ResponseEntity<CountryDto> getCountry(@RequestHeader("X-cdr-correlation-id") String correlationId,
-                                          @PathVariable int id);
+    ResponseEntity<CountryDto> getCountry(@PathVariable int id);
 
     /**
      * Gets a person's location.
      *
-     * @param countryId The id of the country.
-     * @param stateId The id of the state.
-     * @param countyId The id of the county.
-     * @param cityId The id of the city.
+     * @param countryId   The id of the country.
+     * @param stateId     The id of the state.
+     * @param countyId    The id of the county.
+     * @param cityId      The id of the city.
      * @param communityId The id of the community.
      * @return The location.
      */
     @GetMapping(METADATA_BASE_URL
             + "/person-location/{countryId}/{stateId}/{countyId}/{cityId}/{communityId}")
-    ResponseEntity<CountryDto> getPersonLocation(@RequestHeader("X-cdr-correlation-id") String correlationId,
-                                                 @PathVariable int countryId, @PathVariable Integer stateId,
+    ResponseEntity<CountryDto> getPersonLocation(@PathVariable int countryId, @PathVariable Integer stateId,
                                                  @PathVariable Integer countyId, @PathVariable Integer cityId,
                                                  @PathVariable Integer communityId);
 

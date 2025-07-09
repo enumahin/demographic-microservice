@@ -75,7 +75,7 @@ class PersonControllerTest {
     void testGetPerson() throws Exception {
         // given
         PersonDto person = personDtoBuilder.personId(1L).build();
-        when(personService.getPerson("CORRELATION_ID", 1L, false)).thenReturn(person);
+        when(personService.getPerson(1L, false)).thenReturn(person);
 
         // when & then
         mockMvc.perform(get(Constants.PERSON_BASE_URL + "/{id}", 1L))
@@ -93,7 +93,7 @@ class PersonControllerTest {
         PersonDto personDto = personDtoBuilder.build();
         PersonDto savedPerson = personDtoBuilder.personId(1L).build();
         
-        when(personService.addPerson(any(PersonDto.class), anyString())).thenReturn(savedPerson);
+        when(personService.addPerson(any(PersonDto.class))).thenReturn(savedPerson);
 
         // when & then
         mockMvc.perform(post(Constants.PERSON_BASE_URL)
@@ -113,7 +113,7 @@ class PersonControllerTest {
         PersonDto personDto = personDtoBuilder.gender('F').build();
         PersonDto updatedPerson = personDtoBuilder.personId(1L).gender('F').build();
         
-        when(personService.updatePerson(eq(1L), any(PersonDto.class), anyString())).thenReturn(updatedPerson);
+        when(personService.updatePerson(eq(1L), any(PersonDto.class))).thenReturn(updatedPerson);
 
         // when & then
         mockMvc.perform(put(Constants.PERSON_BASE_URL + "/{id}", 1L)
@@ -231,7 +231,7 @@ class PersonControllerTest {
                 .build();
         PersonDto updatedPerson = personDtoBuilder.personId(1L).build();
         
-        when(personService.addAddress(eq(1L), any(PersonAddressDto.class), any(String.class))).thenReturn(addressDto);
+        when(personService.addAddress(eq(1L), any(PersonAddressDto.class))).thenReturn(addressDto);
 
         // when & then
         mockMvc.perform(post(Constants.PERSON_BASE_URL + "/{personId}/addresses", 1L)
@@ -252,7 +252,7 @@ class PersonControllerTest {
                 .preferred(true)
                 .build();
         
-        when(personService.updateAddress(eq(1L), eq(1L), any(Boolean.class), any(String.class))).thenReturn(addressDto);
+        when(personService.updateAddress(eq(1L), eq(1L), any(Boolean.class))).thenReturn(addressDto);
 
         // when & then
         mockMvc.perform(put(Constants.PERSON_BASE_URL + "/{personId}/addresses/{addressId}", 1L, 1L)

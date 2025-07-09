@@ -10,6 +10,13 @@ spring:
     openfeign:
       circuitbreaker:
         enabled: true
+    function:
+      definition: personConsumer
+    stream:
+      bindings:
+        personConsumer-in-0:
+          destination: demographic-data
+          group: ${spring.application.name}
 
   datasource:
     url: jdbc:mysql://localhost:3306/demographics?createDatabaseIfNotExist=true
@@ -17,7 +24,7 @@ spring:
     password: root
 
   jpa:
-    show-sql: true
+    show-sql: false
     hibernate:
       ddl-auto: update
     database-platform: org.hibernate.dialect.MySQL8Dialect

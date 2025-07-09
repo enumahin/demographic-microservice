@@ -33,7 +33,7 @@ public class MetadataFallback implements MetadataFeignClient {
      * @return The country.
      */
     @Override
-    public ResponseEntity<CountryDto> getCountry(String correlationId, int id) {
+    public ResponseEntity<CountryDto> getCountry(int id) {
         return ResponseEntity.ok(null);
     }
 
@@ -48,7 +48,7 @@ public class MetadataFallback implements MetadataFeignClient {
      * @return The location.
      */
     @Override
-    public ResponseEntity<CountryDto> getPersonLocation(String correlationId, int countryId, Integer stateId,
+    public ResponseEntity<CountryDto> getPersonLocation(int countryId, Integer stateId,
                                                         Integer countyId, Integer cityId, Integer communityId) {
         return ResponseEntity.ok(null);
     }

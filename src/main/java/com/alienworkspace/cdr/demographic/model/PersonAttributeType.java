@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,9 +27,11 @@ import lombok.Setter;
 @Entity(name = "person_attribute_type")
 public class PersonAttributeType extends AuditTrail {
 
+    @Getter
+    @Setter
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "person_attribute_type_id")
+    @NotNull
+    @Column(name = "person_attribute_type_id", nullable = false)
     private int personAttributeTypeId;
     private String name;
     private String description;

@@ -26,11 +26,11 @@ public interface PersonService {
     /**
      * Retrieves a person by their ID.
      *
-     * @param personId the ID of the person to be retrieved
+     * @param personId      the ID of the person to be retrieved
      * @param includeVoided a flag indicating whether to include voided records
      * @return a PersonDto object containing the data of the person with the given ID
      */
-    PersonDto getPerson(String correlationId, Long personId, boolean includeVoided);
+    PersonDto getPerson(Long personId, boolean includeVoided);
 
     /**
      * Adds a new person to the system.
@@ -38,16 +38,16 @@ public interface PersonService {
      * @param personDto the PersonDto object containing the data of the person to be added
      * @return a PersonDto object containing the data of the newly added person
      */
-    PersonDto addPerson(PersonDto personDto, String correlationId);
+    PersonDto addPerson(PersonDto personDto);
 
     /**
      * Updates an existing person in the system.
      *
-     * @param personId the ID of the person to be updated
+     * @param personId  the ID of the person to be updated
      * @param personDto the PersonDto object containing the updated data of the person
      * @return a PersonDto object containing the updated data of the person
      */
-    PersonDto updatePerson(long personId, PersonDto personDto, String correlationId);
+    PersonDto updatePerson(long personId, PersonDto personDto);
 
     /**
      * Deletes a person by their ID.
@@ -79,11 +79,11 @@ public interface PersonService {
     /**
      * Adds a new person address to the system.
      *
-     * @param personId the ID of the person the address belongs to
+     * @param personId         the ID of the person the address belongs to
      * @param personAddressDto the PersonAddressDto object containing the data of the person address to be added
      * @return a PersonAddressDto object containing the data of the newly added person address
      */
-    PersonAddressDto addAddress(Long personId, PersonAddressDto personAddressDto, String correlationId);
+    PersonAddressDto addAddress(Long personId, PersonAddressDto personAddressDto);
 
     /**
      * Adds a new person attribute to the system.
@@ -107,12 +107,12 @@ public interface PersonService {
     /**
      * Updates an existing person address in the system.
      *
-     * @param personId the ID of the person the address belongs to
+     * @param personId        the ID of the person the address belongs to
      * @param personAddressId the ID of the person address to be updated
-     * @param preferred the preferred address
+     * @param preferred       the preferred address
      * @return a PersonAddressDto object containing the updated data of the person address
      */
-    PersonAddressDto updateAddress(long personId, long personAddressId, boolean preferred, String correlationId);
+    PersonAddressDto updateAddress(long personId, long personAddressId, boolean preferred);
 
     /**
      * Updates an existing person attribute in the system.

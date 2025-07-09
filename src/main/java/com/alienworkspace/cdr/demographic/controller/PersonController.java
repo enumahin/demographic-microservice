@@ -29,7 +29,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -129,10 +128,9 @@ public class PersonController {
             )
     )
     @GetMapping("{id}/{includeVoided}")
-    public ResponseEntity<PersonDto> getPerson(@RequestHeader("X-cdr-correlation-id") String correlationId,
-                                               @PathVariable("id") long id, @PathVariable boolean includeVoided) {
+    public ResponseEntity<PersonDto> getPerson(@PathVariable("id") long id, @PathVariable boolean includeVoided) {
         log.debug("Retrieving person with ID: {}", id);
-        return ResponseEntity.ok(personService.getPerson(correlationId, id, includeVoided));
+        return ResponseEntity.ok(personService.getPerson(id, includeVoided));
     }
 
     /**
@@ -162,10 +160,9 @@ public class PersonController {
             )
     )
     @PostMapping
-    public PersonDto addPerson(@RequestHeader("X-cdr-correlation-id") String correlationId,
-                               @Valid @RequestBody PersonDto personDto) {
-        log.debug("Adding person with correlationId: {}", correlationId);
-        return personService.addPerson(personDto, correlationId);
+    public PersonDto addPerson(@Valid @RequestBody PersonDto personDto) {
+        log.debug("Adding person");
+        return personService.addPerson(personDto);
     }
 
     /**
@@ -201,11 +198,10 @@ public class PersonController {
             )
     )
     @PutMapping("/{id}")
-    public ResponseEntity<PersonDto> updatePerson(@RequestHeader("X-cdr-correlation-id") String correlationId,
-                                                  @PathVariable("id") Long id,
+    public ResponseEntity<PersonDto> updatePerson(@PathVariable("id") Long id,
                                                   @Valid @RequestBody PersonDto personDto) {
-        log.debug("Updating person with ID: {} with correlationId: {}", id, correlationId);
-        return ResponseEntity.ok(personService.updatePerson(id, personDto, correlationId));
+        log.debug("Updating person with ID: {}", id);
+        return ResponseEntity.ok(personService.updatePerson(id, personDto));
     }
 
     /**
@@ -346,7 +342,7 @@ public class PersonController {
     /**
      * Adds a new person address.
      *
-     * @param personId the ID of the person to add the address to
+     * @param personId         the ID of the person to add the address to
      * @param personAddressDto the data transfer object containing the details of the person address to add
      * @return the added person address as a PersonAddressDto
      */
@@ -371,19 +367,17 @@ public class PersonController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/{personId}/addresses")
     public ResponseEntity<PersonAddressDto> addPersonAddress(
-            @RequestHeader("X-cdr-correlation-id") String correlationId,
             @PathVariable("personId") long personId,
             @Valid @RequestBody PersonAddressDto personAddressDto) {
-        log.info("Correlation ID: {}", correlationId);
-        return ResponseEntity.ok(personService.addAddress(personId, personAddressDto, correlationId));
+        return ResponseEntity.ok(personService.addAddress(personId, personAddressDto));
     }
 
     /**
      * Updates an existing person address.
      *
-     * @param personId the ID of the person to update the address for
+     * @param personId        the ID of the person to update the address for
      * @param personAddressId the ID of the person address to update
-     * @param preferred the preferred address
+     * @param preferred       the preferred address
      * @return the updated person address as a PersonAddressDto
      */
     @Operation(
@@ -406,12 +400,10 @@ public class PersonController {
     )
     @PutMapping("/{personId}/addresses/{personAddressId}")
     public ResponseEntity<PersonAddressDto> updatePersonAddress(
-                                                         @RequestHeader("X-cdr-correlation-id") String correlationId,
                                                          @PathVariable("personId") long personId,
                                                          @PathVariable("personAddressId") long personAddressId,
                                                          @RequestBody boolean preferred) {
-        log.info("Correlation ID: {}", correlationId);
-        return ResponseEntity.ok(personService.updateAddress(personId, personAddressId, preferred, correlationId));
+        return ResponseEntity.ok(personService.updateAddress(personId, personAddressId, preferred));
     }
 
     /**
